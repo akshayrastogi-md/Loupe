@@ -24,7 +24,8 @@ const bridge: LoupeBridge = {
   adbReverse: () => ipcRenderer.invoke(IPC.adbReverse),
   adbDevices: () => ipcRenderer.invoke(IPC.adbDevices),
   openInEditor: (file, lineNumber) => ipcRenderer.invoke(IPC.openInEditor, file, lineNumber),
-  openDebugger: (panel) => ipcRenderer.invoke(IPC.openDebugger, panel)
+  openDebugger: (panel) => ipcRenderer.invoke(IPC.openDebugger, panel),
+  openDeepLink: (url, platform) => ipcRenderer.invoke(IPC.openDeepLink, url, platform)
 }
 
 contextBridge.exposeInMainWorld('loupe', bridge)

@@ -36,6 +36,15 @@ loupe.trackZustand('cart', useCartStore)
 loupe.trackStore('session', { getState, subscribe, dispatch, restore })
 ```
 
+### React Navigation
+
+Shows navigation state in the **State** panel, logs each screen change, and lets you navigate or time-travel from the desktop:
+
+```ts
+const navigationRef = createNavigationContainerRef()
+<NavigationContainer ref={navigationRef} onReady={() => loupe.trackNavigation(navigationRef)}>
+```
+
 ### TanStack Query
 
 Shows every cached query in Loupe's **Queries** panel, with status, data, errors and observers. You can refetch, invalidate, reset or remove queries from the desktop:

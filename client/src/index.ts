@@ -15,13 +15,20 @@ import { trackQueryClient, type QueryBridge, type QueryClientLike } from './quer
 import { installConsole } from './console'
 import { installErrors, toErrorPayload } from './errors'
 import { installPerformance } from './perf'
-import { createReduxEnhancer, StateRegistry, trackZustand, type StoreAdapter } from './state'
+import {
+  createReduxEnhancer,
+  StateRegistry,
+  trackNavigation,
+  trackZustand,
+  type NavigationRefLike,
+  type StoreAdapter
+} from './state'
 import { installStorage, type AsyncStorageLike, type StorageBridge } from './storage'
 import { collectDeviceInfo, detectHost, getBundleUrl, getReactNative } from './environment'
 import { serialize } from './serialize'
 
 export * from './protocol'
-export type { StoreAdapter, AsyncStorageLike, QueryClientLike }
+export type { StoreAdapter, AsyncStorageLike, QueryClientLike, NavigationRefLike }
 
 export interface LoupeOptions {
   /**
@@ -61,6 +68,8 @@ export interface LoupeClient {
   trackStore(name: string, adapter: StoreAdapter): () => void
   trackZustand(name: string, store: Parameters<typeof trackZustand>[2]): () => void
   reduxEnhancer(name?: string): ReturnType<typeof createReduxEnhancer>
+  /** Show React Navigation state in the State panel; dispatch and time travel navigate the app. */
+  trackNavigation(navigationRef: NavigationRefLike, name?: string): () => void
   /** Show a TanStack Query client's cache in Loupe's Queries panel. */
   trackQueryClient(client: QueryClientLike, name?: string): () => void
   registerCommand(command: CustomCommand): () => void
@@ -110,6 +119,7 @@ function createNoopClient(): LoupeClient {
     trackZustand: () => noop,
     reduxEnhancer: () => identityEnhancer,
     trackQueryClient: () => noop,
+    trackNavigation: () => noop,
     registerCommand: () => noop
   }
   return client
@@ -313,6 +323,7 @@ export function createLoupe(options: LoupeOptions = {}): LoupeClient {
       }
     },
     trackZustand: (name, store) => trackZustand(registry, name, store),
+    trackNavigation: (navigationRef, name = 'navigation') => trackNavigation(registry, name, navigationRef),
     reduxEnhancer: (name = 'redux') => createReduxEnhancer(registry, name),
     trackQueryClient: (queryClient, name = 'default') => {
       queryClients.get(name)?.dispose()

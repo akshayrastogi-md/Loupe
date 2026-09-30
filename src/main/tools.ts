@@ -72,6 +72,50 @@ export async function adbReverse(ports: number[]): Promise<CommandResult> {
   return { ok: true, output: `Reversed ports ${ports.join(', ')} on ${serials.join(', ')}` }
 }
 
+const BLOCKED_SCHEMES = new Set(['javascript:', 'file:', 'data:', 'vbscript:', 'about:', 'blob:'])
+
+/** Validate a deep link: must parse as a URL with a safe scheme. */
+export function validateDeepLink(url: string): string | null {
+  let parsed: URL
+  try {
+    parsed = new URL(url)
+  } catch {
+    return 'Enter a full URL including its scheme, e.g. myapp://profile/42'
+  }
+  if (BLOCKED_SCHEMES.has(parsed.protocol)) return `The ${parsed.protocol} scheme is not allowed`
+  return null
+}
+
+/** Open a deep link on the booted iOS simulator or on connected Android devices. */
+export async function openDeepLink(url: string, platform: 'ios' | 'android'): Promise<CommandResult> {
+  const invalid = validateDeepLink(url)
+  if (invalid) return { ok: false, error: invalid }
+  if (platform === 'ios') {
+    const res = await run('xcrun', ['simctl', 'openurl', 'booted', url], ADB_TIMEOUT_MS)
+    if (!res.ok && /No devices are booted/i.test(res.error ?? '')) {
+      return { ok: false, error: 'No iOS simulator is booted' }
+    }
+    // LaunchServices code 115: nothing on the simulator is registered for this scheme.
+    if (!res.ok && /code=115|failed to open/i.test(res.error ?? '')) {
+      return {
+        ok: false,
+        error: `No app on the simulator handles ${new URL(url).protocol}// links. Is the app installed and the URL scheme registered?`
+      }
+    }
+    return res.ok ? { ok: true, output: `Opened ${url} on the iOS simulator` } : res
+  }
+  const res = await run(
+    findAdb(),
+    ['shell', 'am', 'start', '-W', '-a', 'android.intent.action.VIEW', '-d', url],
+    ADB_TIMEOUT_MS
+  )
+  if (!res.ok) return res
+  if (/Error:|Activity not started/i.test(res.output ?? '')) {
+    return { ok: false, error: (res.output ?? '').split('\n').find((l) => /Error|not started/.test(l)) ?? res.output }
+  }
+  return { ok: true, output: `Opened ${url} on Android` }
+}
+
 /** Send a command to every app connected to Metro via its message socket. */
 export function metroCommand(metroPort: number, method: 'reload' | 'devMenu'): Promise<CommandResult> {
   return new Promise((resolve) => {

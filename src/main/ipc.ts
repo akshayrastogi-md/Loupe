@@ -5,7 +5,16 @@ import { IPC } from '@shared/ipc'
 import type { ServerMessage } from '@shared/protocol'
 import type { DeviceHub } from './server/hub'
 import { conditionsSchema, mockRuleSchema, settingsSchema, type Persistence } from './persistence'
-import { adbDevices, adbReverse, metroCommand, openDebugger, openInEditor, replayRequest, symbolicate } from './tools'
+import {
+  adbDevices,
+  adbReverse,
+  metroCommand,
+  openDebugger,
+  openDeepLink,
+  openInEditor,
+  replayRequest,
+  symbolicate
+} from './tools'
 
 const SERVER_MESSAGE_TYPES = [
   'state.request',
@@ -147,6 +156,13 @@ export function registerIpc({ hub, persistence, getWindow }: IpcDeps): void {
     openDebugger(
       metroPort(),
       parse(z.enum(['console', 'sources', 'memory', 'timeline']).optional(), panel ?? undefined, 'debugger panel')
+    )
+  )
+
+  ipcMain.handle(IPC.openDeepLink, (_e, url: unknown, platform: unknown) =>
+    openDeepLink(
+      parse(z.string().min(1).max(4096), url, 'deep link'),
+      parse(z.enum(['ios', 'android']), platform, 'platform')
     )
   )
 

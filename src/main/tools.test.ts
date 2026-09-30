@@ -41,3 +41,22 @@ describe('openDebugger', () => {
     expect(res.error).toContain('Cannot reach Metro')
   })
 })
+
+describe('deep links', () => {
+  it('validates schemes', async () => {
+    const { validateDeepLink } = await import('./tools')
+    expect(validateDeepLink('myapp://profile/42')).toBeNull()
+    expect(validateDeepLink('https://example.com/invite?code=1')).toBeNull()
+    expect(validateDeepLink('javascript:alert(1)')).toContain('not allowed')
+    expect(validateDeepLink('file:///etc/passwd')).toContain('not allowed')
+    expect(validateDeepLink('profile/42')).toContain('full URL')
+  })
+
+  it('rejects invalid links before running any tool', async () => {
+    const { openDeepLink } = await import('./tools')
+    expect(await openDeepLink('javascript:alert(1)', 'ios')).toEqual({
+      ok: false,
+      error: 'The javascript: scheme is not allowed'
+    })
+  })
+})

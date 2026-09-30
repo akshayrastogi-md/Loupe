@@ -119,3 +119,38 @@ export function trackZustand(registry: StateRegistry, name: string, store: Zusta
     unregister()
   }
 }
+
+/** The parts of a React Navigation container ref the SDK uses. */
+export interface NavigationRefLike {
+  isReady(): boolean
+  getRootState(): unknown
+  getCurrentRoute(): { name: string; params?: unknown } | undefined
+  addListener(event: 'state', callback: () => void): () => void
+  dispatch(action: unknown): void
+  resetRoot(state?: unknown): void
+}
+
+/**
+ * Track React Navigation: every screen change is logged as an action,
+ * "Dispatch" sends navigation actions and "Jump to this state" resets the stack.
+ */
+export function trackNavigation(registry: StateRegistry, name: string, ref: NavigationRefLike): () => void {
+  const getState = (): unknown => (ref.isReady() ? ref.getRootState() : null)
+  const unregister = registry.register(name, {
+    getState,
+    dispatch: (action) => ref.isReady() && ref.dispatch(action),
+    restore: (state) => ref.isReady() && ref.resetRoot(state ?? undefined)
+  })
+  const unsubscribe = ref.addListener('state', () => {
+    const route = ref.getCurrentRoute()
+    registry.reportAction(
+      name,
+      { type: route ? `navigate/${route.name}` : 'navigate', params: route?.params },
+      getState()
+    )
+  })
+  return () => {
+    unsubscribe()
+    unregister()
+  }
+}

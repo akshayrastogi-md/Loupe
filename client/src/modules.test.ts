@@ -136,3 +136,35 @@ describe('packaging', () => {
     expect(loupe.isConnected()).toBe(false)
   })
 })
+
+describe('trackNavigation', () => {
+  it('logs screen changes, dispatches actions and resets state', async () => {
+    const { StateRegistry, trackNavigation } = await import('./state')
+    const sent: Msg[] = []
+    const registry = new StateRegistry((m) => sent.push(m))
+    let listener: () => void = () => undefined
+    let root: unknown = { index: 0, routes: [{ name: 'Home' }] }
+    const ref = {
+      isReady: () => true,
+      getRootState: () => root,
+      getCurrentRoute: () => ({ name: 'Profile', params: { id: 7 } }),
+      addListener: (_e: 'state', cb: () => void) => {
+        listener = cb
+        return () => undefined
+      },
+      dispatch: vi.fn(),
+      resetRoot: vi.fn((state: unknown) => {
+        root = state
+      })
+    }
+    trackNavigation(registry, 'navigation', ref)
+    root = { index: 1, routes: [{ name: 'Home' }, { name: 'Profile' }] }
+    listener()
+    const action = sent.find((m) => m.type === 'state.action') as Extract<Msg, { type: 'state.action' }>
+    expect(action.payload.action).toEqual({ type: 'navigate/Profile', params: { id: 7 } })
+    registry.dispatch('navigation', { type: 'NAVIGATE', payload: { name: 'Settings' } })
+    expect(ref.dispatch).toHaveBeenCalledWith({ type: 'NAVIGATE', payload: { name: 'Settings' } })
+    registry.restore('navigation', { index: 0, routes: [{ name: 'Home' }] })
+    expect(ref.resetRoot).toHaveBeenCalledWith({ index: 0, routes: [{ name: 'Home' }] })
+  })
+})

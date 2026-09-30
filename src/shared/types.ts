@@ -99,6 +99,7 @@ export interface LoupeBridge {
   adbDevices(): Promise<CommandResult>
   openInEditor(file: string, lineNumber: number): Promise<CommandResult>
   openDebugger(panel?: 'console' | 'sources' | 'memory' | 'timeline'): Promise<CommandResult>
+  openDeepLink(url: string, platform: 'ios' | 'android'): Promise<CommandResult>
 }
 
 export type { CommandDescriptor }

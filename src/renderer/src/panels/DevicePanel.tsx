@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Bug, Cable, Cpu, Menu, Play, RefreshCw, Smartphone, TerminalSquare, Zap } from 'lucide-react'
+import { Bug, Cable, Cpu, Link2, Menu, Play, RefreshCw, Smartphone, TerminalSquare, Zap } from 'lucide-react'
 import type { CommandDescriptor } from '@shared/protocol'
 import { formatTime, previewValue } from '@shared/format'
 import type { CommandResult } from '@shared/types'
@@ -109,6 +109,91 @@ function ToolButton({
 
 const report = (res: CommandResult): void =>
   res.ok ? toast('success', res.output || 'Done') : toast('error', res.error ?? 'Failed')
+
+const RECENT_LINKS_KEY = 'loupe:recent-deep-links'
+const MAX_RECENT_LINKS = 8
+
+function readRecentLinks(): string[] {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(RECENT_LINKS_KEY) ?? '[]')
+    return Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : []
+  } catch {
+    return []
+  }
+}
+
+function DeepLinkCard({ defaultPlatform }: { defaultPlatform: 'ios' | 'android' }) {
+  const [url, setUrl] = useState('')
+  const [platform, setPlatform] = useState<'ios' | 'android'>(defaultPlatform)
+  const [recent, setRecent] = useState<string[]>(readRecentLinks)
+  const [busy, setBusy] = useState(false)
+
+  const open = async (link: string): Promise<void> => {
+    const target = link.trim()
+    if (!target) return
+    setBusy(true)
+    const res = await window.loupe.openDeepLink(target, platform)
+    setBusy(false)
+    report(res)
+    if (!res.ok) return
+    const next = [target, ...recent.filter((l) => l !== target)].slice(0, MAX_RECENT_LINKS)
+    setRecent(next)
+    try {
+      localStorage.setItem(RECENT_LINKS_KEY, JSON.stringify(next))
+    } catch {
+      // Recent links are a convenience only.
+    }
+  }
+
+  return (
+    <div className="card">
+      <div className="card-head">
+        <Link2 size={14} /> Deep links
+        <span className="faint" style={{ fontWeight: 400 }}>
+          simulator / emulator
+        </span>
+      </div>
+      <div className="card-body col" style={{ gap: 10 }}>
+        <div className="row">
+          <select
+            className="select"
+            value={platform}
+            onChange={(e) => setPlatform(e.target.value as 'ios' | 'android')}
+            aria-label="Target platform"
+          >
+            <option value="ios">iOS simulator</option>
+            <option value="android">Android</option>
+          </select>
+          <input
+            className="input mono grow"
+            placeholder="myapp://profile/42"
+            value={url}
+            spellCheck={false}
+            onChange={(e) => setUrl(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && void open(url)}
+          />
+          <button className="btn primary" onClick={() => open(url)} disabled={busy || !url.trim()}>
+            Open
+          </button>
+        </div>
+        {recent.length > 0 && (
+          <div className="row" style={{ flexWrap: 'wrap', gap: 6 }}>
+            {recent.map((link) => (
+              <button
+                key={link}
+                className="chip mono"
+                style={{ border: '1px solid var(--border)' }}
+                onClick={() => open(link)}
+              >
+                {link}
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
 
 export function DevicePanel() {
   const device = useSelectedDevice()
@@ -234,6 +319,8 @@ export function DevicePanel() {
             </pre>
           )}
         </div>
+
+        <DeepLinkCard defaultPlatform={info.platform === 'android' ? 'android' : 'ios'} />
 
         <div className="col" style={{ gap: 12, gridColumn: '1 / -1' }}>
           <div className="row">
