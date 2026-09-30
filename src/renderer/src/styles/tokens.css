@@ -1,0 +1,102 @@
+:root {
+  --font-ui: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'SF Mono', 'JetBrains Mono', 'Cascadia Code', Menlo, Consolas, monospace;
+
+  --radius-sm: 4px;
+  --radius: 6px;
+  --radius-lg: 10px;
+
+  --titlebar-h: 44px;
+  --statusbar-h: 26px;
+  --sidebar-w: 60px;
+  --toolbar-h: 40px;
+  --row-h: 28px;
+
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+}
+
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0b0d12;
+  --bg-sunken: #08090d;
+  --surface: #11141b;
+  --surface-2: #161a23;
+  --surface-3: #1c212c;
+  --hover: rgba(255, 255, 255, 0.04);
+  --active: rgba(255, 255, 255, 0.07);
+  --border: #222734;
+  --border-strong: #2d3342;
+
+  --text: #e6e8ee;
+  --text-dim: #a1a9ba;
+  --text-faint: #6b7385;
+
+  --accent: #8b6cff;
+  --accent-strong: #a48bff;
+  --accent-soft: rgba(139, 108, 255, 0.14);
+  --accent-contrast: #ffffff;
+
+  --green: #3ecf8e;
+  --green-soft: rgba(62, 207, 142, 0.12);
+  --yellow: #f5b83d;
+  --yellow-soft: rgba(245, 184, 61, 0.12);
+  --red: #f26b6b;
+  --red-soft: rgba(242, 107, 107, 0.12);
+  --blue: #5aa9ff;
+  --blue-soft: rgba(90, 169, 255, 0.12);
+  --cyan: #3cc8d8;
+  --orange: #ff9454;
+  --pink: #f07ab8;
+
+  --json-key: #9fb4ff;
+  --json-string: #7fd6a6;
+  --json-number: #f5b35a;
+  --json-bool: #e98bd6;
+  --json-null: #8a93a6;
+
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px var(--border);
+  --selection: rgba(139, 108, 255, 0.18);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --bg: #f4f5f8;
+  --bg-sunken: #eceef3;
+  --surface: #ffffff;
+  --surface-2: #f8f9fb;
+  --surface-3: #eff1f5;
+  --hover: rgba(15, 20, 35, 0.04);
+  --active: rgba(15, 20, 35, 0.07);
+  --border: #e2e5eb;
+  --border-strong: #d2d6df;
+
+  --text: #161a23;
+  --text-dim: #505a6d;
+  --text-faint: #8a92a3;
+
+  --accent: #6b4dff;
+  --accent-strong: #5636f0;
+  --accent-soft: rgba(107, 77, 255, 0.1);
+
+  --green: #12a36b;
+  --green-soft: rgba(18, 163, 107, 0.1);
+  --yellow: #c78500;
+  --yellow-soft: rgba(199, 133, 0, 0.1);
+  --red: #d93f3f;
+  --red-soft: rgba(217, 63, 63, 0.09);
+  --blue: #2477e0;
+  --blue-soft: rgba(36, 119, 224, 0.09);
+  --cyan: #0f98a8;
+  --orange: #d9661c;
+  --pink: #c9458d;
+
+  --json-key: #3753c7;
+  --json-string: #17804f;
+  --json-number: #b35d00;
+  --json-bool: #a3339a;
+  --json-null: #7a8294;
+
+  --shadow-lg: 0 16px 48px rgba(20, 25, 40, 0.16), 0 0 0 1px var(--border);
+  --selection: rgba(107, 77, 255, 0.12);
+}

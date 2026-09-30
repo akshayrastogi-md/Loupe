@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <!-- Required by the V8 JIT under the hardened runtime. -->
+    <key>com.apple.security.cs.allow-jit</key>
+    <true/>
+    <!-- The WebSocket server accepts connections from simulators and devices. -->
+    <key>com.apple.security.network.server</key>
+    <true/>
+    <!-- Replay requests, Metro and update checks. -->
+    <key>com.apple.security.network.client</key>
+    <true/>
+  </dict>
+</plist>

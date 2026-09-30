@@ -1,0 +1,72 @@
+appId: dev.prism.devtools
+productName: Prism DevTools
+copyright: Copyright © 2026 Prism DevTools contributors
+
+directories:
+  buildResources: build
+  output: release/${version}
+
+files:
+  - out/**/*
+  - package.json
+
+# Harden the shipped binary. See https://www.electronjs.org/docs/latest/tutorial/fuses
+electronFuses:
+  runAsNode: false
+  enableNodeOptionsEnvironmentVariable: false
+  enableNodeCliInspectArguments: false
+  enableCookieEncryption: true
+  enableEmbeddedAsarIntegrityValidation: true
+  onlyLoadAppFromAsar: true
+  # Flipping fuses edits the binary; re-sign ad hoc so unsigned local builds still
+  # launch on Apple Silicon (real signing replaces this signature).
+  resetAdHocDarwinSignature: true
+
+mac:
+  category: public.app-category.developer-tools
+  icon: build/icon.png
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
+  # Signing uses CSC_LINK / CSC_KEY_PASSWORD; notarization runs automatically
+  # when APPLE_ID, APPLE_APP_SPECIFIC_PASSWORD and APPLE_TEAM_ID are set.
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+    - target: zip
+      arch: [arm64, x64]
+
+dmg:
+  artifactName: Prism-DevTools-${version}-${arch}.${ext}
+
+win:
+  icon: build/icon.png
+  target:
+    - target: nsis
+      arch: [x64, arm64]
+
+nsis:
+  artifactName: Prism-DevTools-Setup-${version}-${arch}.${ext}
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  deleteAppDataOnUninstall: false
+
+linux:
+  icon: build/icon.png
+  category: Development
+  maintainer: Prism DevTools contributors
+  target:
+    - AppImage
+    - deb
+
+appImage:
+  artifactName: Prism-DevTools-${version}-${arch}.${ext}
+
+# Auto-update: uncomment and fill in to publish releases (e.g. GitHub Releases).
+# The app enables electron-updater only when this is configured.
+# publish:
+#   provider: github
+#   owner: your-org
+#   repo: prism-devtools

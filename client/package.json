@@ -1,0 +1,46 @@
+{
+  "name": "prism-devtools-client",
+  "version": "0.1.0",
+  "description": "React Native client SDK for Prism DevTools: network inspector, logs, state, storage, performance, mocks.",
+  "keywords": [
+    "react-native",
+    "devtools",
+    "debugger",
+    "network-inspector",
+    "redux",
+    "zustand",
+    "async-storage",
+    "expo"
+  ],
+  "license": "MIT",
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "react-native": "dist/esm/index.js",
+  "types": "dist/types/index.d.ts",
+  "source": "src/index.ts",
+  "files": [
+    "dist",
+    "src",
+    "!src/**/*.test.ts",
+    "!src/testing.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "clean": "node -e \"require('fs').rmSync('dist',{recursive:true,force:true})\"",
+    "build": "npm run clean && tsc -p tsconfig.build.json && tsc -p tsconfig.build.cjs.json",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "react-native": ">=0.70"
+  },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

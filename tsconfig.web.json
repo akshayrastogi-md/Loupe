@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "composite": true,
+    "jsx": "react-jsx",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": []
+  },
+  "include": [
+    "src/renderer/src/**/*",
+    "src/shared/**/*",
+    "client/src/protocol.ts",
+    "client/src/mocks.ts",
+    "src/preload/*.d.ts"
+  ]
+}

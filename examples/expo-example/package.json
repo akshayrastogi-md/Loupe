@@ -1,0 +1,25 @@
+{
+  "name": "expo-example",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "2.2.0",
+    "expo": "~57.0.26",
+    "expo-status-bar": "~57.0.1",
+    "prism-devtools-client": "file:../prism-devtools-client-0.1.0.tgz",
+    "react": "19.2.3",
+    "react-native": "0.86.3",
+    "zustand": "^5.0.15"
+  },
+  "devDependencies": {
+    "@types/react": "~19.2.2",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web"
+  },
+  "private": true
+}

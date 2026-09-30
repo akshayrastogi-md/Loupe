@@ -1,0 +1,14 @@
+node_modules
+out
+release
+coverage
+*.log
+.DS_Store
+client/dist
+test-results
+playwright-report
+examples/*.tgz
+examples/*/node_modules
+examples/*/.expo
+builder-debug.yml
+*.tsbuildinfo
