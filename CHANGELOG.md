@@ -4,6 +4,9 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Fixed (SDK `loupe-rn` 0.1.1)
+- `asyncStorage` now accepts **AsyncStorage v3** (`getMany`/`setMany`/`removeMany`). Before this fix, TypeScript reported "Property 'multiGet' is missing", and the Storage panel failed at runtime. v2 still works, as does any storage with just `getItem`.
+
 ### Changed
 - Renamed the project from Prism to **Loupe**. The SDK is now `loupe-rn` (`createLoupe`). Settings, mocks and window state migrate automatically from the old app's data folder.
 

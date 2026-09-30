@@ -87,7 +87,7 @@ loupe.log('checkout started', { cartId })
 | `host` | auto | Loupe's host. By default it tries the Metro host, then `localhost` (iOS simulator), then `10.0.2.2` (Android emulator). |
 | `port` | `9393` | Must match Loupe's port setting. |
 | `network`, `console`, `errors`, `performance`, `websockets` | `true` | Turn individual features on or off. |
-| `asyncStorage` | none | Pass your AsyncStorage instance to enable the Storage panel. |
+| `asyncStorage` | none | Pass your AsyncStorage instance to enable the Storage panel. Works with `@react-native-async-storage/async-storage` v2 and v3. |
 | `ignoreUrls` | `[]` | URLs containing any of these strings are never captured. |
 
 ## How it works

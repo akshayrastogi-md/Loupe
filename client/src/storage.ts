@@ -1,16 +1,50 @@
 import type { ClientMessage } from './protocol'
 
-/** The subset of @react-native-async-storage/async-storage that Loupe needs. */
+type Entry = [string, string | null]
+
+/**
+ * The subset of @react-native-async-storage/async-storage that Loupe needs.
+ * Works with v2 (multiGet), v3 (getMany) and any storage exposing getItem.
+ */
 export interface AsyncStorageLike {
   getAllKeys(): Promise<readonly string[]>
-  multiGet(keys: readonly string[]): Promise<ReadonlyArray<readonly [string, string | null]>>
+  getItem(key: string): Promise<string | null>
   setItem(key: string, value: string): Promise<void>
   removeItem(key: string): Promise<void>
   clear(): Promise<void>
+  /** AsyncStorage v2 batch read. */
+  multiGet?(keys: readonly string[]): Promise<ReadonlyArray<readonly [string, string | null]>>
+  /** AsyncStorage v3 batch read. */
+  getMany?(keys: string[]): Promise<Record<string, string | null>>
 }
 
 const REFRESH_DEBOUNCE_MS = 300
-const MUTATORS = ['setItem', 'removeItem', 'mergeItem', 'clear', 'multiSet', 'multiRemove', 'multiMerge'] as const
+// v2 and v3 write APIs; whichever exist are wrapped to refresh the desktop view.
+const MUTATORS = [
+  'setItem',
+  'removeItem',
+  'mergeItem',
+  'clear',
+  'multiSet',
+  'multiRemove',
+  'multiMerge',
+  'setMany',
+  'removeMany'
+] as const
+
+/** Read every entry using the best batch API the storage offers. */
+async function readAll(storage: AsyncStorageLike): Promise<Entry[]> {
+  const keys = [...(await storage.getAllKeys())]
+  if (typeof storage.multiGet === 'function') {
+    const pairs = await storage.multiGet(keys)
+    return pairs.map(([k, v]) => [k, v] as Entry)
+  }
+  if (typeof storage.getMany === 'function') {
+    const values = await storage.getMany(keys)
+    return keys.map((k) => [k, values[k] ?? null] as Entry)
+  }
+  return Promise.all(keys.map(async (k) => [k, await storage.getItem(k)] as Entry))
+}
 
 export interface StorageBridge {
   snapshot(): Promise<void>
@@ -25,9 +59,7 @@ export function installStorage(storage: AsyncStorageLike, send: (message: Client
 
   const snapshot = async (): Promise<void> => {
     try {
-      const keys = await storage.getAllKeys()
-      const pairs = await storage.multiGet(keys)
-      send({ type: 'storage.snapshot', payload: { entries: pairs.map(([k, v]) => [k, v] as [string, string | null]) } })
+      send({ type: 'storage.snapshot', payload: { entries: await readAll(storage) } })
     } catch (err) {
       send({
         type: 'console',

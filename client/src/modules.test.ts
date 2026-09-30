@@ -168,3 +168,67 @@ describe('trackNavigation', () => {
     expect(ref.resetRoot).toHaveBeenCalledWith({ index: 0, routes: [{ name: 'Home' }] })
   })
 })
+
+describe('AsyncStorage compatibility', () => {
+  const settle = (ms = 400): Promise<void> => new Promise((r) => setTimeout(r, ms))
+
+  function v3Storage(initial: Record<string, string>) {
+    const data = new Map(Object.entries(initial))
+    return {
+      data,
+      getItem: async (k: string) => data.get(k) ?? null,
+      setItem: async (k: string, v: string) => void data.set(k, v),
+      removeItem: async (k: string) => void data.delete(k),
+      getMany: vi.fn(async (keys: string[]) => Object.fromEntries(keys.map((k) => [k, data.get(k) ?? null]))),
+      setMany: async (entries: Record<string, string>) => Object.entries(entries).forEach(([k, v]) => data.set(k, v)),
+      removeMany: async (keys: string[]) => keys.forEach((k) => data.delete(k)),
+      getAllKeys: async () => Array.from(data.keys()),
+      clear: async () => data.clear()
+    }
+  }
+
+  it('snapshots AsyncStorage v3 through getMany', async () => {
+    const { installStorage } = await import('./storage')
+    const sent: Msg[] = []
+    const storage = v3Storage({ token: 'abc', theme: 'dark' })
+    await installStorage(storage, (m) => sent.push(m)).snapshot()
+    expect(storage.getMany).toHaveBeenCalledWith(['token', 'theme'])
+    expect(sent[0]).toMatchObject({
+      type: 'storage.snapshot',
+      payload: {
+        entries: [
+          ['token', 'abc'],
+          ['theme', 'dark']
+        ]
+      }
+    })
+  })
+
+  it('refreshes after the app writes with v3 setMany/removeMany', async () => {
+    const { installStorage } = await import('./storage')
+    const sent: Msg[] = []
+    const storage = v3Storage({ a: '1' })
+    const bridge = installStorage(storage, (m) => sent.push(m))
+    await storage.setMany({ b: '2' })
+    await storage.removeMany(['a'])
+    await settle()
+    const last = sent.filter((m) => m.type === 'storage.snapshot').at(-1)
+    expect(last?.payload).toEqual({ entries: [['b', '2']] })
+    bridge.uninstall()
+  })
+
+  it('falls back to getItem when no batch API exists', async () => {
+    const { installStorage } = await import('./storage')
+    const sent: Msg[] = []
+    const data = new Map([['k', 'v']])
+    const storage = {
+      getItem: async (k: string) => data.get(k) ?? null,
+      setItem: async (k: string, v: string) => void data.set(k, v),
+      removeItem: async (k: string) => void data.delete(k),
+      getAllKeys: async () => Array.from(data.keys()),
+      clear: async () => data.clear()
+    }
+    await installStorage(storage, (m) => sent.push(m)).snapshot()
+    expect(sent[0].payload).toEqual({ entries: [['k', 'v']] })
+  })
+})
