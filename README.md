@@ -38,7 +38,15 @@ Loupe puts all of it in **one fast desktop window**, connected over a WebSocket 
 
 ## Quick start
 
-**1. Install the desktop app.** Download it from [Releases](https://github.com/akshayrastogi-md/Loupe/releases), or [build it from source](#build-from-source).
+**1. Download the desktop app**
+
+| Platform | Download |
+|---|---|
+| macOS, Apple Silicon (M1–M5) | [**Loupe-mac-arm64.dmg**](https://github.com/akshayrastogi-md/Loupe/releases/latest/download/Loupe-mac-arm64.dmg) |
+| macOS, Intel | [**Loupe-mac-x64.dmg**](https://github.com/akshayrastogi-md/Loupe/releases/latest/download/Loupe-mac-x64.dmg) |
+| Windows, Linux | Installers coming soon. For now, [build from source](#build-from-source) (`npm run dist`). |
+
+Open the `.dmg` and drag **Loupe** into Applications. Current builds aren't notarized yet, so on first launch macOS blocks the app: open **System Settings → Privacy & Security** and click **Open Anyway** (you only do this once). All releases are on the [Releases page](https://github.com/akshayrastogi-md/Loupe/releases).
 
 **2. Add the SDK to your app:**
 
