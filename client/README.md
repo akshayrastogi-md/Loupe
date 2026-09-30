@@ -1,8 +1,8 @@
 # loupe-rn
 
-The React Native SDK for [Loupe](../README.md), a desktop debugger for React Native. It sends your app's network traffic, logs, errors, state, AsyncStorage and performance data to the Loupe app. From Loupe you can mock APIs, simulate offline mode or slow networks, and run commands in your app.
+The React Native SDK for [Loupe](https://github.com/akshayrastogi-md/Loupe#readme), a desktop debugger for React Native. It sends your app's network traffic, logs, errors, state, AsyncStorage and performance data to the Loupe app. From Loupe you can mock APIs, simulate offline mode or slow networks, and run commands in your app.
 
-- It has no runtime dependencies and is about 44 kB.
+- It has no runtime dependencies and is about 58 kB.
 - It works with bare React Native and Expo, including Expo Go. It supports RN 0.70 and later and has been tested on RN 0.86.
 - **It does nothing in release builds.** `enabled` defaults to `__DEV__`, so nothing is patched and no socket is opened in production.
 
