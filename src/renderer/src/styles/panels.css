@@ -704,3 +704,9 @@ kbd {
   flex: 1;
   resize: none;
 }
+
+.banner.info {
+  background: var(--accent-soft);
+  border-bottom-color: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--accent-strong);
+}

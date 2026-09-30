@@ -129,7 +129,12 @@ export function App() {
       <TitleBar />
       <Sidebar />
       <main className="main">
-        {device && !device.connected && (
+        {device && !device.connected && device.summary.remoteAddress === 'imported' && (
+          <div className="banner info">
+            Imported session, captured {new Date(device.disconnectedAt ?? 0).toLocaleString()}. Read-only.
+          </div>
+        )}
+        {device && !device.connected && device.summary.remoteAddress !== 'imported' && (
           <div className="banner">
             Device disconnected. Showing captured history. It will resume automatically when the app reconnects.
           </div>

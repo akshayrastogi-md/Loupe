@@ -93,6 +93,8 @@ export interface LoupeBridge {
   updateConditions(conditions: NetworkConditions): Promise<void>
   replayRequest(request: ReplayRequest): Promise<ReplayResult>
   saveFile(defaultName: string, content: string): Promise<boolean>
+  /** Pick and read a text file; null when cancelled. */
+  openFile(extensions: string[]): Promise<{ name: string; content: string } | null>
   symbolicate(frames: StackFrame[]): Promise<StackFrame[] | null>
   metroCommand(command: 'reload' | 'devMenu'): Promise<CommandResult>
   adbReverse(): Promise<CommandResult>

@@ -19,6 +19,7 @@ const bridge: LoupeBridge = {
   updateConditions: (conditions) => ipcRenderer.invoke(IPC.updateConditions, conditions),
   replayRequest: (request) => ipcRenderer.invoke(IPC.replayRequest, request),
   saveFile: (defaultName, content) => ipcRenderer.invoke(IPC.saveFile, defaultName, content),
+  openFile: (extensions) => ipcRenderer.invoke(IPC.openFile, extensions),
   symbolicate: (frames) => ipcRenderer.invoke(IPC.symbolicate, frames),
   metroCommand: (command) => ipcRenderer.invoke(IPC.metroCommand, command),
   adbReverse: () => ipcRenderer.invoke(IPC.adbReverse),

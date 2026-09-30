@@ -1,6 +1,9 @@
 import { app, dialog, ipcMain, type BrowserWindow } from 'electron'
 import { promises as fs } from 'node:fs'
+import { basename } from 'node:path'
 import { z } from 'zod'
+
+const MAX_OPEN_FILE_BYTES = 200 * 1024 * 1024
 import { IPC } from '@shared/ipc'
 import type { ServerMessage } from '@shared/protocol'
 import type { DeviceHub } from './server/hub'
@@ -142,6 +145,18 @@ export function registerIpc({ hub, persistence, getWindow }: IpcDeps): void {
     if (result.canceled || !result.filePath) return false
     await fs.writeFile(result.filePath, data, 'utf8')
     return true
+  })
+
+  ipcMain.handle(IPC.openFile, async (_e, extensions: unknown) => {
+    const exts = parse(z.array(z.string().regex(/^[a-z0-9]{1,10}$/)).max(10), extensions, 'extensions')
+    const win = getWindow()
+    const options = { properties: ['openFile' as const], filters: [{ name: 'Loupe session', extensions: exts }] }
+    const result = win ? await dialog.showOpenDialog(win, options) : await dialog.showOpenDialog(options)
+    const file = result.filePaths[0]
+    if (result.canceled || !file) return null
+    const { size } = await fs.stat(file)
+    if (size > MAX_OPEN_FILE_BYTES) throw new Error(`File is too large (${Math.round(size / 1024 / 1024)} MB)`)
+    return { name: basename(file), content: await fs.readFile(file, 'utf8') }
   })
 
   ipcMain.handle(IPC.symbolicate, (_e, frames: unknown) =>

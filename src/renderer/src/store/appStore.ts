@@ -45,6 +45,7 @@ interface AppState {
   setPaused(paused: boolean): void
   updateDevice(id: string, update: (device: DeviceState) => DeviceState): void
   removeDevice(id: string): void
+  addDevice(device: DeviceState): void
   pushToast(kind: Toast['kind'], message: string): void
   dismissToast(id: number): void
 }
@@ -106,6 +107,9 @@ export const useAppStore = create<AppState>((set, get) => ({
     if (!device) return
     set({ devices: { ...get().devices, [id]: update(device) } })
   },
+
+  addDevice: (device) =>
+    set({ devices: { ...get().devices, [device.summary.id]: device }, selectedDeviceId: device.summary.id }),
 
   removeDevice: (id) => {
     const devices = Object.fromEntries(Object.entries(get().devices).filter(([key]) => key !== id))

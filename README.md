@@ -16,7 +16,7 @@ A desktop debugger for React Native. It shows network traffic, logs, state, stor
 | **Mocks & Throttling** | Mock rules by URL (contains, equals or regex) plus method, with status, headers, body and delay. Also **offline simulation** and latency presets. |
 | **Device & Commands** | Device info. One-click **JS debugger** (React Native DevTools). **Deep-link launcher** for the iOS simulator and Android. React Navigation state via `trackNavigation`. Reload the app or open the dev menu, through the SDK or Metro. `adb reverse`. **Custom commands** your app registers appear as buttons. |
 
-It also supports multiple devices at once, pausing capture, dark, light or system theme, and keyboard shortcuts (`⌘1–9`, `⌘K` to clear, `⌘F` to filter, `⌘,` for settings).
+**Sessions:** export a device's whole capture as a `.loupe` file (secrets hidden by default) and import it on another machine as a read-only device, for sharing bug reports. It also supports multiple devices at once, pausing capture, dark, light or system theme, and keyboard shortcuts (`⌘1–9`, `⌘K` to clear, `⌘F` to filter, `⌘,` for settings).
 
 ## Get started
 

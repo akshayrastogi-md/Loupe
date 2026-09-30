@@ -14,5 +14,6 @@ export const IPC = {
   adbDevices: 'loupe:adb-devices',
   openInEditor: 'loupe:open-in-editor',
   openDebugger: 'loupe:open-debugger',
-  openDeepLink: 'loupe:open-deep-link'
+  openDeepLink: 'loupe:open-deep-link',
+  openFile: 'loupe:open-file'
 } as const

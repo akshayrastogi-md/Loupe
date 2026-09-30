@@ -123,6 +123,26 @@ test('shows state actions and storage from the device', async () => {
   await expect(page.getByText('@auth/token')).toBeVisible()
 })
 
+test('exports a session and imports it as a read-only device', async () => {
+  const file = join(userData, 'shared.loupe')
+  // Stub the native dialogs in the main process to use a temp file.
+  await app.evaluate(({ dialog }, target) => {
+    dialog.showSaveDialog = (async () => ({ canceled: false, filePath: target })) as typeof dialog.showSaveDialog
+    dialog.showOpenDialog = (async () => ({ canceled: false, filePaths: [target] })) as typeof dialog.showOpenDialog
+  }, file)
+  await page.getByTitle('Export session (share a capture)').click()
+  await page.getByRole('button', { name: /Export \.loupe/ }).click()
+  await expect(page.getByText('Saved ')).toBeVisible()
+  await page.getByTitle('Import session').click()
+  await expect(page.getByText(/Imported session, captured/)).toBeVisible()
+  await expect(page.locator('.device-trigger')).toContainText('(imported)')
+  await nav('Network').click()
+  await expect(page.locator('.table-row').first()).toBeVisible()
+  // Switch back to the live device for the remaining tests.
+  await page.locator('.device-trigger').click()
+  await page.locator('.device-option', { hasText: 'LIVE' }).click()
+})
+
 test('marks the device offline when it disconnects', async () => {
   demo?.kill()
   demo = null

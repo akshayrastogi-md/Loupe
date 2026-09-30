@@ -22,6 +22,7 @@ import {
 } from 'lucide-react'
 import type { Platform } from '@shared/protocol'
 import { useAppStore, useSelectedDevice, type PanelId } from '../store/appStore'
+import { SessionActions } from './SessionActions'
 import type { DeviceState } from '../store/deviceState'
 
 export const PANELS: ReadonlyArray<{ id: PanelId; label: string; icon: typeof Globe }> = [
@@ -157,6 +158,7 @@ export function TitleBar() {
             <FlaskConical size={11} /> {activeMocks} MOCK{activeMocks > 1 ? 'S' : ''}
           </button>
         )}
+        <SessionActions />
         <button
           className={`icon-btn${paused ? ' active' : ''}`}
           title={paused ? 'Resume capturing' : 'Pause capturing'}
