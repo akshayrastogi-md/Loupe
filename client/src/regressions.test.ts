@@ -206,6 +206,28 @@ describe('fetch capture', () => {
     expect(sent('network.error')[0].payload.kind).toBe('error')
   })
 
+  it('resends requests from the device when the desktop asks', async () => {
+    const calls: Array<[string, RequestInit | undefined]> = []
+    setup((async (url: string, init?: RequestInit) => {
+      calls.push([url, init])
+      return new Response('{}', { status: 200, headers: { 'content-type': 'application/json' } })
+    }) as typeof fetch)
+    socket.receive({
+      type: 'network.resend',
+      payload: { url: 'https://api.test/edit', method: 'patch', headers: { 'x-a': '1' }, body: '{"b":2}' }
+    })
+    socket.receive({ type: 'network.resend', payload: { url: 'file:///etc/passwd', method: 'GET', headers: {} } })
+    socket.receive({
+      type: 'network.resend',
+      payload: { url: 'https://api.test/get', method: 'GET', headers: {}, body: 'x' }
+    })
+    await tick(5)
+    expect(calls.map(([u]) => u)).toEqual(['https://api.test/edit', 'https://api.test/get'])
+    expect(calls[0][1]).toMatchObject({ method: 'PATCH', body: '{"b":2}' })
+    expect(calls[1][1]?.body).toBeUndefined()
+    expect(sent('network.request').map((m) => m.payload.url)).toEqual(['https://api.test/edit', 'https://api.test/get'])
+  })
+
   it('does not double-capture XHR-based fetch polyfills', async () => {
     FakeXHR.nextResponse = { status: 200, body: 'hi', headers: '' }
     setup(

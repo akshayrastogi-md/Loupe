@@ -4,6 +4,7 @@ import type {
   CommandDescriptor,
   MockRule,
   NetworkConditions,
+  ResendRequest,
   ServerMessage
 } from './protocol'
 import { DEFAULT_PORT } from './protocol'
@@ -151,6 +152,21 @@ export function createLoupe(options: LoupeOptions = {}): LoupeClient {
     }
   }
 
+  /** Re-issue a request from inside the app; the network instrumentation records it. */
+  const resendRequest = async (request: ResendRequest): Promise<void> => {
+    if (!/^https?:\/\//i.test(request.url)) return
+    const method = request.method.toUpperCase()
+    try {
+      await fetch(request.url, {
+        method,
+        headers: request.headers,
+        body: method === 'GET' || method === 'HEAD' ? undefined : request.body
+      })
+    } catch {
+      // The failure is already captured as a network error.
+    }
+  }
+
   const handleServerMessage = (message: ServerMessage): void => {
     switch (message.type) {
       case 'welcome':
@@ -186,6 +202,9 @@ export function createLoupe(options: LoupeOptions = {}): LoupeClient {
         return
       case 'storage.clear':
         void storage?.clear()
+        return
+      case 'network.resend':
+        void resendRequest(message.payload)
         return
       case 'command.run':
         void runCommand(message.payload.commandId, message.payload.runId, message.payload.args)

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Copy, FlaskConical, Plus, Save, Trash2, WifiOff } from 'lucide-react'
 import type { MockMatchType, MockRule } from '@shared/protocol'
 import { ruleMatches } from '@shared/mocks'
+import { headersToText, textToHeaders } from '@shared/headerText'
 import { useAppStore } from '../store/appStore'
 import { EmptyState, Switch } from '../components/ui'
 import { blankMock, saveConditions, saveMocks, useMockSelection } from '../lib/mocks'
@@ -16,25 +17,6 @@ const LATENCY_PRESETS: ReadonlyArray<{ label: string; value: number }> = [
 ]
 
 const METHODS = ['ANY', 'GET', 'POST', 'PUT', 'PATCH', 'DELETE'] as const
-
-function headersToText(headers: Record<string, string>): string {
-  return Object.entries(headers)
-    .map(([k, v]) => `${k}: ${v}`)
-    .join('\n')
-}
-
-function textToHeaders(text: string): Record<string, string> {
-  return Object.fromEntries(
-    text
-      .split('\n')
-      .map((line) => line.trim())
-      .filter((line) => line.includes(':'))
-      .map((line) => {
-        const idx = line.indexOf(':')
-        return [line.slice(0, idx).trim().toLowerCase(), line.slice(idx + 1).trim()]
-      })
-  )
-}
 
 function NetworkConditionsCard() {
   const conditions = useAppStore((s) => s.conditions)

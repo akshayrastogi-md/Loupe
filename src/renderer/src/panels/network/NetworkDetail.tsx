@@ -13,9 +13,10 @@ import { formatBytes, formatDuration, formatTime } from '@shared/format'
 import { toCurl, toFetch } from '@shared/snippets'
 import type { ReplayResult } from '@shared/types'
 import { KeyValue, Modal, Section, Tabs } from '../../components/ui'
-import { copyText, toast } from '../../lib/actions'
+import { copyText } from '../../lib/actions'
 import { createMockFromEntry } from '../../lib/mocks'
 import { BodyView } from './BodyView'
+import { ResendModal } from './ResendModal'
 
 type TabId = 'headers' | 'payload' | 'response' | 'timing'
 
@@ -71,29 +72,11 @@ function ReplayModal({ result, onClose }: { result: ReplayResult; onClose: () =>
 export function NetworkDetail({ entry, onClose }: { entry: NetworkEntry; onClose: () => void }) {
   const [tab, setTab] = useState<TabId>('headers')
   const [replay, setReplay] = useState<ReplayResult | null>(null)
-  const [replaying, setReplaying] = useState(false)
+  const [editing, setEditing] = useState(false)
   const { request, response, error } = entry
   const url = splitUrl(request.url)
   const duration = entryDuration(entry)
   const isImage = resourceKind(entry) === 'image'
-
-  const doReplay = async (): Promise<void> => {
-    setReplaying(true)
-    try {
-      setReplay(
-        await window.loupe.replayRequest({
-          url: request.url,
-          method: request.method,
-          headers: request.headers,
-          body: request.body
-        })
-      )
-    } catch (err) {
-      toast('error', (err as Error).message)
-    } finally {
-      setReplaying(false)
-    }
-  }
 
   return (
     <div className="panel detail">
@@ -130,8 +113,8 @@ export function NetworkDetail({ entry, onClose }: { entry: NetworkEntry; onClose
             </button>
           )}
           <span className="spacer" />
-          <button className="btn sm" onClick={doReplay} disabled={replaying}>
-            <RotateCw size={12} className={replaying ? 'spin' : undefined} /> Replay
+          <button className="btn sm" onClick={() => setEditing(true)} title="Edit and resend this request">
+            <RotateCw size={12} /> Edit & resend
           </button>
           <button className="btn sm" onClick={() => createMockFromEntry(entry)} disabled={!response}>
             <FlaskConical size={12} /> Mock
@@ -227,6 +210,13 @@ export function NetworkDetail({ entry, onClose }: { entry: NetworkEntry; onClose
         )}
       </div>
       {replay && <ReplayModal result={replay} onClose={() => setReplay(null)} />}
+      {editing && (
+        <ResendModal
+          initial={{ url: request.url, method: request.method, headers: request.headers, body: request.body }}
+          onClose={() => setEditing(false)}
+          onDesktopResult={setReplay}
+        />
+      )}
     </div>
   )
 }

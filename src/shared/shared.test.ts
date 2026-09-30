@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { toCurl, toFetch } from './snippets'
 import { toHar } from './har'
+import { headersToText, textToHeaders } from './headerText'
 import { diff } from './diff'
 import { isLibraryFrame, parseStack, shortFile } from './stack'
 import { formatBytes, formatDuration, formatTime, prettyJson, previewValue, tryParseJson } from './format'
@@ -216,5 +217,12 @@ describe('format', () => {
     expect(previewValue('abc', 2)).toBe('ab…')
     expect(previewValue({ a: 1 })).toBe('{"a":1}')
     expect(previewValue([1, 2, 3], 3)).toBe('[1,…')
+  })
+})
+
+describe('header text', () => {
+  it('round-trips headers and ignores malformed lines', () => {
+    expect(headersToText({ a: '1', b: 'x: y' })).toBe('a: 1\nb: x: y')
+    expect(textToHeaders('A: 1\n\nnot a header\n: empty\nB:  x: y ')).toEqual({ a: '1', b: 'x: y' })
   })
 })

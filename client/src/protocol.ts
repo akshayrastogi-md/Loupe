@@ -137,6 +137,14 @@ export interface NetworkConditions {
   latencyMs: number
 }
 
+/** A request the desktop asks the app to send through its own networking. */
+export interface ResendRequest {
+  url: string
+  method: string
+  headers: HttpHeaders
+  body?: string
+}
+
 export type ClientMessage =
   | { type: 'hello'; payload: DeviceInfo }
   | { type: 'network.request'; payload: NetworkRequestPayload }
@@ -163,6 +171,7 @@ export type ServerMessage =
   | { type: 'mocks.update'; payload: { mocks: MockRule[] } }
   | { type: 'network.conditions'; payload: NetworkConditions }
   | { type: 'command.run'; payload: { commandId: string; runId: string; args: Record<string, unknown> } }
+  | { type: 'network.resend'; payload: ResendRequest }
   | { type: 'app.reload'; payload: Record<string, never> }
   | { type: 'app.devMenu'; payload: Record<string, never> }
 
