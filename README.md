@@ -44,9 +44,14 @@ Loupe puts all of it in **one fast desktop window**, connected over a WebSocket 
 |---|---|
 | macOS, Apple Silicon (M1–M5) | [**Loupe-mac-arm64.dmg**](https://github.com/akshayrastogi-md/Loupe/releases/latest/download/Loupe-mac-arm64.dmg) |
 | macOS, Intel | [**Loupe-mac-x64.dmg**](https://github.com/akshayrastogi-md/Loupe/releases/latest/download/Loupe-mac-x64.dmg) |
-| Windows, Linux | Installers coming soon. For now, [build from source](#build-from-source) (`npm run dist`). |
+| Windows (x64) | [**Loupe-windows-x64-setup.exe**](https://github.com/akshayrastogi-md/Loupe/releases/latest/download/Loupe-windows-x64-setup.exe) |
+| Windows (ARM) | [**Loupe-windows-arm64-setup.exe**](https://github.com/akshayrastogi-md/Loupe/releases/latest/download/Loupe-windows-arm64-setup.exe) |
+| Linux (x64) | [**AppImage**](https://github.com/akshayrastogi-md/Loupe/releases/latest/download/Loupe-linux-x86_64.AppImage) · [**.deb**](https://github.com/akshayrastogi-md/Loupe/releases/latest/download/Loupe-linux-amd64.deb) |
+| Linux (ARM64) | [**AppImage**](https://github.com/akshayrastogi-md/Loupe/releases/latest/download/Loupe-linux-arm64.AppImage) · [**.deb**](https://github.com/akshayrastogi-md/Loupe/releases/latest/download/Loupe-linux-arm64.deb) |
 
-Open the `.dmg` and drag **Loupe** into Applications. Current builds aren't notarized yet, so on first launch macOS blocks the app: open **System Settings → Privacy & Security** and click **Open Anyway** (you only do this once). All releases are on the [Releases page](https://github.com/akshayrastogi-md/Loupe/releases).
+**macOS:** open the `.dmg` and drag **Loupe** into Applications. Current builds aren't notarized yet, so on first launch macOS blocks the app: open **System Settings → Privacy & Security** and click **Open Anyway** (you only do this once).
+**Windows:** run the installer. SmartScreen may warn about an unrecognized app because builds aren't code-signed yet: click **More info → Run anyway**.
+**Linux:** `chmod +x Loupe-linux-*.AppImage && ./Loupe-linux-*.AppImage`, or `sudo apt install ./Loupe-linux-amd64.deb`. All releases are on the [Releases page](https://github.com/akshayrastogi-md/Loupe/releases).
 
 **2. Add the SDK to your app:**
 
