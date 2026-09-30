@@ -9,9 +9,10 @@ import {
   type ResourceKind
 } from '@shared/network'
 import { toHar } from '@shared/har'
+import { redactEntry } from '@shared/redact'
 import { formatBytes } from '@shared/format'
 import { useSelectedDevice, useAppStore } from '../../store/appStore'
-import { Chips, EmptyState, SearchInput } from '../../components/ui'
+import { Chips, EmptyState, Modal, SearchInput, Switch } from '../../components/ui'
 import { SplitPane } from '../../components/SplitPane'
 import { saveFile } from '../../lib/actions'
 import { NetworkTable } from './NetworkTable'
@@ -34,6 +35,8 @@ export function NetworkPanel() {
   const appVersion = useAppStore((s) => s.appVersion)
   const [filter, setFilter] = useState<NetworkFilter>(EMPTY_FILTER)
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [exporting, setExporting] = useState(false)
+  const [redact, setRedact] = useState(true)
 
   const all = useMemo(() => (device ? device.network.order.map((id) => device.network.byId[id]) : []), [device])
   const entries = useMemo(() => all.filter((e) => matchesFilter(e, filter)), [all, filter])
@@ -75,7 +78,8 @@ export function NetworkPanel() {
 
   const exportHar = (): void => {
     const name = `${device?.summary.info.appName ?? 'loupe'}-${new Date().toISOString().replace(/[:.]/g, '-')}.har`
-    void saveFile(name, toHar(entries, appVersion))
+    void saveFile(name, toHar(redact ? entries.map(redactEntry) : entries, appVersion))
+    setExporting(false)
   }
 
   return (
@@ -128,7 +132,7 @@ export function NetworkPanel() {
         <button
           className="icon-btn"
           title="Export visible requests as HAR"
-          onClick={exportHar}
+          onClick={() => setExporting(true)}
           disabled={!entries.length}
         >
           <Download size={15} />
@@ -158,6 +162,33 @@ export function NetworkPanel() {
             selected ? <NetworkDetail key={selected.id} entry={selected} onClose={() => setSelectedId(null)} /> : null
           }
         />
+      )}
+      {exporting && (
+        <Modal
+          title="Export HAR"
+          onClose={() => setExporting(false)}
+          footer={
+            <>
+              <button className="btn" onClick={() => setExporting(false)}>
+                Cancel
+              </button>
+              <button className="btn primary" onClick={exportHar}>
+                <Download size={13} /> Export {entries.length} requests
+              </button>
+            </>
+          }
+        >
+          <label className="row">
+            <Switch on={redact} onChange={setRedact} label="Hide secrets" />
+            <span className="col">
+              <span>Hide secrets (recommended)</span>
+              <span className="faint" style={{ fontSize: 12 }}>
+                Masks Authorization, cookies and API-key headers, token and password fields in bodies, and secret query
+                parameters, so the file is safe to share.
+              </span>
+            </span>
+          </label>
+        </Modal>
       )}
     </div>
   )
