@@ -4,6 +4,8 @@ import type {
   ConsolePayload,
   ErrorPayload,
   PerfSamplePayload,
+  SocketFramePayload,
+  SocketStatus,
   StateActionPayload
 } from '@shared/protocol'
 import type { NetworkEntry } from '@shared/network'
@@ -11,6 +13,26 @@ import type { DeviceSummary, HubEvent } from '@shared/types'
 
 export const MAX_PERF_SAMPLES = 300
 export const MAX_COMMAND_RESULTS = 100
+export const MAX_SOCKETS = 200
+export const MAX_FRAMES_PER_SOCKET = 2000
+
+export interface SocketFrame extends Omit<SocketFramePayload, 'id'> {
+  seq: number
+}
+
+export interface SocketEntry {
+  id: string
+  url: string
+  protocols?: string[]
+  openedAt: number
+  status: 'connecting' | SocketStatus
+  closedAt?: number
+  code?: number
+  reason?: string
+  frames: SocketFrame[]
+  /** Frames dropped because the per-socket cap was reached. */
+  droppedFrames: number
+}
 
 export interface LogEntry extends ConsolePayload {
   id: string
@@ -29,6 +51,7 @@ export interface DeviceState {
   connected: boolean
   disconnectedAt?: number
   network: { order: string[]; byId: Record<string, NetworkEntry> }
+  sockets: { order: string[]; byId: Record<string, SocketEntry> }
   logs: LogEntry[]
   errors: ErrorEntry[]
   actions: ActionEntry[]
@@ -50,6 +73,7 @@ export function createDeviceState(summary: DeviceSummary): DeviceState {
     summary,
     connected: true,
     network: { order: [], byId: {} },
+    sockets: { order: [], byId: {} },
     logs: [],
     errors: [],
     actions: [],
@@ -110,6 +134,46 @@ function applyMessage(draft: Draft, event: Extract<HubEvent, { kind: 'message' }
       network.byId = { ...network.byId, [existing.id]: { ...existing, ...patch } }
       return
     }
+    case 'ws.open': {
+      const sockets = touch(draft, 'sockets')
+      const { id, url, protocols, timestamp } = message.payload
+      if (!Object.hasOwn(sockets.byId, id)) sockets.order = [...sockets.order, id]
+      sockets.byId = {
+        ...sockets.byId,
+        [id]: { id, url, protocols, openedAt: timestamp, status: 'connecting', frames: [], droppedFrames: 0 }
+      }
+      return
+    }
+    case 'ws.status': {
+      const sockets = touch(draft, 'sockets')
+      const { id, status, code, reason, timestamp } = message.payload
+      const existing = Object.hasOwn(sockets.byId, id) ? sockets.byId[id] : undefined
+      if (!existing) return
+      const closed = status === 'closed'
+      sockets.byId = {
+        ...sockets.byId,
+        [id]: { ...existing, status, ...(closed ? { closedAt: timestamp, code, reason } : {}) }
+      }
+      return
+    }
+    case 'ws.frame': {
+      const sockets = touch(draft, 'sockets')
+      const { id, ...frame } = message.payload
+      const existing = Object.hasOwn(sockets.byId, id) ? sockets.byId[id] : undefined
+      if (!existing) return
+      const seq = existing.frames.length + existing.droppedFrames
+      const frames = [...existing.frames, { ...frame, seq }]
+      const overflow = frames.length - MAX_FRAMES_PER_SOCKET
+      sockets.byId = {
+        ...sockets.byId,
+        [id]: {
+          ...existing,
+          frames: overflow > 0 ? frames.slice(overflow) : frames,
+          droppedFrames: existing.droppedFrames + Math.max(0, overflow)
+        }
+      }
+      return
+    }
     case 'console':
       ;(touch(draft, 'logs') as LogEntry[]).push({ ...message.payload, id: nextId() })
       return
@@ -152,6 +216,7 @@ function carryOverHistory(previous: DeviceState, next: DeviceState): DeviceState
   return {
     ...next,
     network: previous.network,
+    sockets: previous.sockets,
     logs: [...previous.logs, divider],
     errors: previous.errors,
     actions: previous.actions,
@@ -210,6 +275,12 @@ export function reduceHubEvents(devices: DevicesMap, events: readonly HubEvent[]
   drafts.forEach((draft) => {
     const d = draft.device
     if (draft.touched.has('network')) d.network = capNetwork(d.network, maxEntries)
+    if (draft.touched.has('sockets') && d.sockets.order.length > MAX_SOCKETS) {
+      const dropped = d.sockets.order.slice(0, d.sockets.order.length - MAX_SOCKETS)
+      const byId = { ...d.sockets.byId }
+      dropped.forEach((id) => delete byId[id])
+      d.sockets = { order: d.sockets.order.slice(-MAX_SOCKETS), byId }
+    }
     if (draft.touched.has('logs')) d.logs = capTail(d.logs, maxEntries)
     if (draft.touched.has('errors')) d.errors = capTail(d.errors, maxEntries)
     if (draft.touched.has('actions')) d.actions = capTail(d.actions, maxEntries)

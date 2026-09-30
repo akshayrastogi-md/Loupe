@@ -290,7 +290,44 @@ function tick(): void {
 let perfTimer: ReturnType<typeof setInterval> | undefined
 let tickTimer: ReturnType<typeof setInterval> | undefined
 
+const CHAT_SOCKET = 'demo-chat'
+let chatTimer: ReturnType<typeof setInterval> | undefined
+
+function chatFrame(direction: 'sent' | 'received', payload: unknown): void {
+  const data = typeof payload === 'string' ? payload : JSON.stringify(payload)
+  send({
+    type: 'ws.frame',
+    payload: { id: CHAT_SOCKET, direction, data, binary: false, size: data.length, timestamp: Date.now() }
+  })
+}
+
+/** A simulated realtime chat socket for the WebSockets view. */
+function startChatSocket(): void {
+  send({
+    type: 'ws.open',
+    payload: {
+      id: CHAT_SOCKET,
+      url: 'wss://realtime.shopfront.dev/v1/chat',
+      protocols: ['chat.v1'],
+      timestamp: Date.now()
+    }
+  })
+  send({ type: 'ws.status', payload: { id: CHAT_SOCKET, status: 'open', timestamp: Date.now() } })
+  chatFrame('sent', { type: 'subscribe', channel: 'order-updates', userId: 7 })
+  chatFrame('received', { type: 'subscribed', channel: 'order-updates' })
+  chatTimer = setInterval(() => {
+    chatFrame('received', {
+      type: 'order.status',
+      orderId: 'o_1',
+      status: pick(['packed', 'shipped', 'out_for_delivery']),
+      at: new Date().toISOString()
+    })
+    if (Math.random() < 0.4) chatFrame('sent', { type: 'ping', t: Date.now() })
+  }, 2500)
+}
+
 function startStreams(): void {
+  startChatSocket()
   let heap = 38
   perfTimer = setInterval(() => {
     heap = Math.max(30, heap + (Math.random() - 0.45) * 2)
@@ -396,6 +433,12 @@ function handle(message: ServerMessage): void {
       console.log('[demo] reload requested, reconnecting…')
       socket.close()
       return
+    case 'ws.send':
+      if (message.payload.id === CHAT_SOCKET) {
+        chatFrame('sent', message.payload.data)
+        chatFrame('received', { type: 'echo', data: message.payload.data })
+      }
+      return
     case 'app.devMenu':
       send({
         type: 'console',
@@ -437,6 +480,7 @@ function connect(): void {
   socket.onclose = () => {
     clearInterval(perfTimer)
     clearInterval(tickTimer)
+    clearInterval(chatTimer)
     console.log('[demo] disconnected, retrying in 2s')
     setTimeout(connect, 2000)
   }

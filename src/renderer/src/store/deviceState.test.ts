@@ -119,3 +119,60 @@ describe('reduceHubEvents', () => {
     expect(reduceHubEvents({}, [msg('nope', request('r'))], 10).devices).toEqual({})
   })
 })
+
+describe('websocket state', () => {
+  const open = (id: string): HubEvent =>
+    msg('d1', { type: 'ws.open', payload: { id, url: `wss://x/${id}`, timestamp: 1 } })
+  const frame = (id: string, data: string): HubEvent =>
+    msg('d1', {
+      type: 'ws.frame',
+      payload: { id, direction: 'received', data, binary: false, size: data.length, timestamp: 2 }
+    })
+
+  it('tracks lifecycle and frames, ignoring unknown sockets', () => {
+    const { devices } = reduceHubEvents(
+      {},
+      [
+        { kind: 'device.connected', device: summary('d1') },
+        open('s1'),
+        msg('d1', { type: 'ws.status', payload: { id: 's1', status: 'open', timestamp: 2 } }),
+        frame('s1', 'hi'),
+        frame('nope', 'x'),
+        msg('d1', {
+          type: 'ws.status',
+          payload: { id: 's1', status: 'closed', code: 1000, reason: 'done', timestamp: 3 }
+        })
+      ],
+      100
+    )
+    const socket = devices.d1.sockets.byId.s1
+    expect(devices.d1.sockets.order).toEqual(['s1'])
+    expect(socket).toMatchObject({ status: 'closed', code: 1000, reason: 'done', closedAt: 3 })
+    expect(socket.frames).toEqual([{ direction: 'received', data: 'hi', binary: false, size: 2, timestamp: 2, seq: 0 }])
+  })
+
+  it('caps frames per socket and counts what was dropped', async () => {
+    const { MAX_FRAMES_PER_SOCKET } = await import('./deviceState')
+    const events: HubEvent[] = [{ kind: 'device.connected', device: summary('d1') }, open('s1')]
+    for (let i = 0; i < MAX_FRAMES_PER_SOCKET + 5; i++) events.push(frame('s1', String(i)))
+    const socket = reduceHubEvents({}, events, 100).devices.d1.sockets.byId.s1
+    expect(socket.frames).toHaveLength(MAX_FRAMES_PER_SOCKET)
+    expect(socket.droppedFrames).toBe(5)
+    expect(socket.frames[0].data).toBe('5')
+    expect(socket.frames.at(-1)?.seq).toBe(MAX_FRAMES_PER_SOCKET + 4)
+  })
+
+  it('keeps socket history across reconnects', () => {
+    let devices: DevicesMap = reduceHubEvents(
+      {},
+      [
+        { kind: 'device.connected', device: summary('d1') },
+        open('s1'),
+        { kind: 'device.disconnected', deviceId: 'd1' }
+      ],
+      100
+    ).devices
+    devices = reduceHubEvents(devices, [{ kind: 'device.connected', device: summary('d2') }], 100).devices
+    expect(devices.d2.sockets.order).toEqual(['s1'])
+  })
+})

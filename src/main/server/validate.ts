@@ -56,6 +56,28 @@ const schemas = {
     endedAt: timestamp,
     kind: z.enum(['error', 'timeout', 'abort', 'offline'])
   }),
+  'ws.open': z.object({
+    id: safeKey,
+    url: z.string().max(65_536),
+    protocols: z.array(shortString).max(32).optional(),
+    timestamp
+  }),
+  'ws.status': z.object({
+    id: safeKey,
+    status: z.enum(['open', 'closing', 'closed', 'error']),
+    code: z.number().int().optional(),
+    reason: shortString.optional(),
+    timestamp
+  }),
+  'ws.frame': z.object({
+    id: safeKey,
+    direction: z.enum(['sent', 'received']),
+    data: z.string().max(70_000),
+    binary: z.boolean(),
+    size: z.number().nonnegative(),
+    truncated: z.boolean().optional(),
+    timestamp
+  }),
   console: z.object({
     level: z.enum(['debug', 'log', 'info', 'warn', 'error']),
     args: z.array(z.unknown()),

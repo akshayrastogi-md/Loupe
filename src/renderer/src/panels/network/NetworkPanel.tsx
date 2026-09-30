@@ -17,6 +17,7 @@ import { SplitPane } from '../../components/SplitPane'
 import { saveFile } from '../../lib/actions'
 import { NetworkTable } from './NetworkTable'
 import { NetworkDetail } from './NetworkDetail'
+import { SocketsView } from './SocketsView'
 
 const KIND_OPTIONS: ReadonlyArray<{ id: ResourceKind; label: string }> = [
   { id: 'json', label: 'JSON' },
@@ -36,6 +37,7 @@ export function NetworkPanel() {
   const [filter, setFilter] = useState<NetworkFilter>(EMPTY_FILTER)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
+  const [mode, setMode] = useState<'http' | 'ws'>('http')
   const [redact, setRedact] = useState(true)
 
   const all = useMemo(() => (device ? device.network.order.map((id) => device.network.byId[id]) : []), [device])
@@ -82,9 +84,23 @@ export function NetworkPanel() {
     setExporting(false)
   }
 
+  const socketCount = device?.sockets.order.length ?? 0
+  const modeSwitch = (
+    <div className="chips" role="tablist" aria-label="Traffic type">
+      <button className={`chip${mode === 'http' ? ' active' : ''}`} onClick={() => setMode('http')}>
+        HTTP<span className="count">{all.length}</span>
+      </button>
+      <button className={`chip${mode === 'ws' ? ' active' : ''}`} onClick={() => setMode('ws')}>
+        WebSockets<span className="count">{socketCount}</span>
+      </button>
+    </div>
+  )
+  if (mode === 'ws') return <SocketsView modeSwitch={modeSwitch} />
+
   return (
     <div className="panel">
       <div className="toolbar">
+        {modeSwitch}
         <SearchInput
           value={filter.text}
           onChange={(text) => setFilter((f) => ({ ...f, text }))}

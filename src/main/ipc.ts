@@ -17,6 +17,7 @@ const SERVER_MESSAGE_TYPES = [
   'storage.clear',
   'command.run',
   'network.resend',
+  'ws.send',
   'app.reload',
   'app.devMenu'
 ] as const
@@ -35,6 +36,8 @@ const resendSchema = z.object({
   headers: z.record(z.string(), z.string()),
   body: z.string().max(5_000_000).optional()
 })
+
+const wsSendSchema = z.object({ id: z.string().min(1).max(512), data: z.string().max(1_000_000) })
 
 const replaySchema = z.object({
   url: z.string().max(65_536),
@@ -76,6 +79,7 @@ export function registerIpc({ hub, persistence, getWindow }: IpcDeps): void {
   ipcMain.handle(IPC.sendToDevice, (_e, deviceId: unknown, message: unknown) => {
     const input = parse(sendSchema, { deviceId, message }, 'device message')
     if (input.message.type === 'network.resend') parse(resendSchema, input.message.payload, 'request')
+    if (input.message.type === 'ws.send') parse(wsSendSchema, input.message.payload, 'socket message')
     return hub.send(input.deviceId, input.message as ServerMessage)
   })
 

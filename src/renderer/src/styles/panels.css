@@ -681,3 +681,26 @@ kbd {
   color: var(--text);
   font-size: 12.5px;
 }
+
+.ws-url {
+  flex: none;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-dim);
+  font-size: 12px;
+  word-break: break-all;
+}
+.ws-composer {
+  flex: none;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  padding: 8px 10px;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+.ws-composer .textarea {
+  flex: 1;
+  resize: none;
+}

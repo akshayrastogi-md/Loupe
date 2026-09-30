@@ -10,6 +10,7 @@ import type {
 import { DEFAULT_PORT } from './protocol'
 import { createTransport, type Transport, type WebSocketFactory } from './transport'
 import { installNetwork } from './network'
+import { installWebSocket } from './websocket'
 import { installConsole } from './console'
 import { installErrors, toErrorPayload } from './errors'
 import { installPerformance } from './perf'
@@ -35,6 +36,8 @@ export interface LoupeOptions {
   console?: boolean
   errors?: boolean
   performance?: boolean
+  /** Record WebSocket connections and frames. */
+  websockets?: boolean
   asyncStorage?: AsyncStorageLike
   /** Extra URL substrings that should never be captured by the network inspector. */
   ignoreUrls?: string[]
@@ -60,7 +63,7 @@ export interface LoupeClient {
   registerCommand(command: CustomCommand): () => void
 }
 
-const METRO_PATHS = ['/symbolicate', '/logs', '/message', '/inspector/', '/open-stack-frame', '/status']
+const METRO_PATHS = ['/symbolicate', '/logs', '/message', '/inspector/', '/open-stack-frame', '/status', '/hot']
 const DEFAULT_IGNORED = ['clients3.google.com/generate_204']
 
 /**
@@ -78,7 +81,9 @@ function candidateHosts(): string[] {
 function metroIgnores(): string[] {
   const bundle = getBundleUrl()
   const origin = bundle?.match(/^https?:\/\/[^/]+/)?.[0]
-  return origin ? METRO_PATHS.map((path) => `${origin}${path}`) : []
+  // Scheme-less so the same pattern matches http:// requests and ws:// sockets.
+  const hostPart = origin?.replace(/^https?:/, '')
+  return hostPart ? METRO_PATHS.map((path) => `${hostPart}${path}`) : []
 }
 
 declare const __DEV__: boolean | undefined
@@ -116,6 +121,7 @@ export function createLoupe(options: LoupeOptions = {}): LoupeClient {
   let idCounter = 0
   let uninstallers: Array<() => void> = []
   let storage: StorageBridge | null = null
+  let sendToSocket: ((id: string, data: string) => boolean) | null = null
   const commands = new Map<string, CustomCommand>()
 
   // `transport` is assigned below; closures only call it after connect().
@@ -206,6 +212,9 @@ export function createLoupe(options: LoupeOptions = {}): LoupeClient {
       case 'network.resend':
         void resendRequest(message.payload)
         return
+      case 'ws.send':
+        sendToSocket?.(message.payload.id, message.payload.data)
+        return
       case 'command.run':
         void runCommand(message.payload.commandId, message.payload.runId, message.payload.args)
         return
@@ -250,6 +259,18 @@ export function createLoupe(options: LoupeOptions = {}): LoupeClient {
             ignoreUrls: [...DEFAULT_IGNORED, ...metroIgnores(), ...(options.ignoreUrls ?? [])]
           })
         )
+      }
+      if (options.websockets !== false) {
+        const sockets = installWebSocket({
+          send,
+          nextId: () => `ws-${Date.now().toString(36)}-${(idCounter++).toString(36)}`,
+          ignoreUrls: [...metroIgnores(), ...(options.ignoreUrls ?? [])]
+        })
+        sendToSocket = sockets.sendTo
+        uninstallers.push(() => {
+          sendToSocket = null
+          sockets.uninstall()
+        })
       }
       if (options.console !== false) uninstallers.push(installConsole(send))
       if (options.errors !== false) uninstallers.push(installErrors(send))

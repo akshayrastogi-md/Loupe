@@ -53,6 +53,33 @@ export interface NetworkErrorPayload {
   kind: 'error' | 'timeout' | 'abort' | 'offline'
 }
 
+export interface SocketOpenPayload {
+  id: string
+  url: string
+  protocols?: string[]
+  timestamp: number
+}
+
+export type SocketStatus = 'open' | 'closing' | 'closed' | 'error'
+
+export interface SocketStatusPayload {
+  id: string
+  status: SocketStatus
+  code?: number
+  reason?: string
+  timestamp: number
+}
+
+export interface SocketFramePayload {
+  id: string
+  direction: 'sent' | 'received'
+  data: string
+  binary: boolean
+  size: number
+  truncated?: boolean
+  timestamp: number
+}
+
 export type LogLevel = 'debug' | 'log' | 'info' | 'warn' | 'error'
 
 export interface ConsolePayload {
@@ -150,6 +177,9 @@ export type ClientMessage =
   | { type: 'network.request'; payload: NetworkRequestPayload }
   | { type: 'network.response'; payload: NetworkResponsePayload }
   | { type: 'network.error'; payload: NetworkErrorPayload }
+  | { type: 'ws.open'; payload: SocketOpenPayload }
+  | { type: 'ws.status'; payload: SocketStatusPayload }
+  | { type: 'ws.frame'; payload: SocketFramePayload }
   | { type: 'console'; payload: ConsolePayload }
   | { type: 'error'; payload: ErrorPayload }
   | { type: 'state.action'; payload: StateActionPayload }
@@ -172,6 +202,7 @@ export type ServerMessage =
   | { type: 'network.conditions'; payload: NetworkConditions }
   | { type: 'command.run'; payload: { commandId: string; runId: string; args: Record<string, unknown> } }
   | { type: 'network.resend'; payload: ResendRequest }
+  | { type: 'ws.send'; payload: { id: string; data: string } }
   | { type: 'app.reload'; payload: Record<string, never> }
   | { type: 'app.devMenu'; payload: Record<string, never> }
 

@@ -71,6 +71,17 @@ test('streams network traffic from a connected device', async () => {
   await expect(page.getByText('Request URL')).toBeVisible()
 })
 
+test('inspects WebSocket frames and sends into a live socket', async () => {
+  await nav('Network').click()
+  await page.getByRole('button', { name: /WebSockets/ }).click()
+  await expect(page.locator('.action-row', { hasText: '/v1/chat' })).toBeVisible()
+  await expect(page.locator('.table-row', { hasText: 'subscribe' }).first()).toBeVisible()
+  await page.getByPlaceholder(/Send a text frame/).fill('hello from e2e')
+  await page.getByRole('button', { name: 'Send', exact: true }).click()
+  await expect(page.locator('.table-row', { hasText: 'echo' }).first()).toBeVisible()
+  await page.getByRole('button', { name: /^HTTP/ }).click()
+})
+
 test('creates a mock from a captured request', async () => {
   await nav('Network').click()
   // Close any open detail pane first: clicking a selected row toggles it off.
