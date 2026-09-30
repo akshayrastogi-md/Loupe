@@ -9,7 +9,7 @@ export interface StoreAdapter {
   restore?(state: unknown): void
 }
 
-export const RESTORE_ACTION = '@@prism/RESTORE'
+export const RESTORE_ACTION = '@@loupe/RESTORE'
 
 const now = (): number =>
   typeof performance !== 'undefined' && typeof performance.now === 'function' ? performance.now() : Date.now()
@@ -72,7 +72,7 @@ const withRestore =
 
 /**
  * Redux store enhancer. Works with `createStore` and RTK's `configureStore`:
- *   enhancers: (getDefault) => getDefault().concat(prism.reduxEnhancer())
+ *   enhancers: (getDefault) => getDefault().concat(loupe.reduxEnhancer())
  */
 export function createReduxEnhancer(registry: StateRegistry, name: string) {
   return (createStore: StoreCreator): StoreCreator =>

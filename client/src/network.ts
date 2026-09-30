@@ -24,7 +24,7 @@ interface RequestMeta {
 }
 
 type AnyXHR = XMLHttpRequest & { [META]?: RequestMeta }
-const META = Symbol.for('prism.xhr.meta')
+const META = Symbol.for('loupe.xhr.meta')
 
 /**
  * Set only while the original fetch() runs synchronously. An XHR opened in that
@@ -322,7 +322,7 @@ function patchFetch(ctx: NetworkContext): () => void {
   if (!originalFetch) return () => undefined
   let fetchUsesXhr: boolean | undefined
 
-  g.fetch = async function prismFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
+  g.fetch = async function loupeFetch(input: RequestInfo | URL, init?: RequestInit): Promise<Response> {
     const request = input as { url?: string; method?: string; headers?: unknown; signal?: AbortSignal }
     const url = typeof input === 'string' ? input : (request.url ?? String(input))
     if (shouldIgnore(ctx, url)) return originalFetch(input, init)

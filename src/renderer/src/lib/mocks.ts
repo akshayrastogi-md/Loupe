@@ -51,7 +51,7 @@ export async function saveMocks(mocks: MockRule[]): Promise<boolean> {
   const previous = useAppStore.getState().mocks
   useAppStore.getState().setMocks(mocks)
   try {
-    await window.prism.updateMocks(mocks)
+    await window.loupe.updateMocks(mocks)
     return true
   } catch (err) {
     useAppStore.getState().setMocks(previous)
@@ -64,7 +64,7 @@ export async function saveConditions(conditions: NetworkConditions): Promise<voi
   const previous = useAppStore.getState().conditions
   useAppStore.getState().setConditions(conditions)
   try {
-    await window.prism.updateConditions(conditions)
+    await window.loupe.updateConditions(conditions)
   } catch (err) {
     useAppStore.getState().setConditions(previous)
     toast('error', (err as Error).message)

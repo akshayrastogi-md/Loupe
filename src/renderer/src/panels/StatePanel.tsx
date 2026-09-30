@@ -116,8 +116,8 @@ export function StatePanel() {
     return (
       <div className="panel">
         <EmptyState icon={<Layers size={22} />} title="No state stores connected">
-          Connect Redux with <code>prism.reduxEnhancer()</code>, Zustand with <code>prism.trackZustand()</code>, or any
-          store with <code>prism.trackStore()</code>. You get an action log, state diffs, dispatch and time travel.
+          Connect Redux with <code>loupe.reduxEnhancer()</code>, Zustand with <code>loupe.trackZustand()</code>, or any
+          store with <code>loupe.trackStore()</code>. You get an action log, state diffs, dispatch and time travel.
         </EmptyState>
       </div>
     )

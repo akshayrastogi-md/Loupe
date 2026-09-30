@@ -49,7 +49,7 @@ export async function adbDevices(): Promise<CommandResult> {
   return run(findAdb(), ['devices', '-l'], ADB_TIMEOUT_MS)
 }
 
-/** Forward the Prism and Metro ports from every connected Android device to this machine. */
+/** Forward the Loupe and Metro ports from every connected Android device to this machine. */
 export async function adbReverse(ports: number[]): Promise<CommandResult> {
   const adb = findAdb()
   const list = await run(adb, ['devices'], ADB_TIMEOUT_MS)

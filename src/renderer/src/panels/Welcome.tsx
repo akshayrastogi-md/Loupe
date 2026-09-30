@@ -4,18 +4,18 @@ import { copyText } from '../lib/actions'
 
 const installSnippet = (port: number): string => `// index.js (or App.tsx) — load before anything else
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import createPrism from 'prism-devtools-client'
+import createLoupe from 'loupe-rn'
 
 if (__DEV__) {
-  const prism = createPrism({
+  const loupe = createLoupe({
     appName: 'My App',
     asyncStorage: AsyncStorage,${port !== 9393 ? `\n    port: ${port},` : ''}
   }).connect()
 
   // Redux Toolkit:
-  // configureStore({ reducer, enhancers: (d) => d().concat(prism.reduxEnhancer()) })
+  // configureStore({ reducer, enhancers: (d) => d().concat(loupe.reduxEnhancer()) })
   // Zustand:
-  // prism.trackZustand('app', useAppStore)
+  // loupe.trackZustand('app', useAppStore)
 }`
 
 export function Welcome() {
@@ -30,11 +30,20 @@ export function Welcome() {
           <Radio size={26} />
         </div>
         <h1>Waiting for your React Native app</h1>
-        <p className="dim">
-          Prism is listening on <span className="mono">{status.listening ? `port ${status.port}` : 'no port'}</span>.
-          Add the client SDK to your app and it connects automatically on simulators, emulators and devices on your
-          network.
-        </p>
+        {status.listening ? (
+          <p className="dim">
+            Loupe is listening on <span className="mono">port {status.port}</span>. Add the client SDK to your app and
+            it connects automatically on simulators, emulators and devices on your network.
+          </p>
+        ) : (
+          <div className="welcome-error" role="alert">
+            <strong>Loupe can’t accept connections:</strong> {status.error ?? 'the server is not running'}.{' '}
+            {status.error?.includes('in use') && 'Another copy of Loupe (or another tool) may be using it. '}
+            <button className="btn sm" onClick={() => setSettingsOpen(true)}>
+              Change port
+            </button>
+          </div>
+        )}
 
         <div className="steps">
           <div className="step">
@@ -42,10 +51,10 @@ export function Welcome() {
             <div className="grow">
               <div className="step-title">Install the client</div>
               <div className="code-line">
-                <code>npm install --save-dev prism-devtools-client</code>
+                <code>npm install --save-dev loupe-rn</code>
                 <button
                   className="icon-btn sm"
-                  onClick={() => copyText('npm install --save-dev prism-devtools-client')}
+                  onClick={() => copyText('npm install --save-dev loupe-rn')}
                   aria-label="Copy"
                 >
                   <Copy size={12} />
@@ -95,7 +104,7 @@ export function Welcome() {
           </div>
         </div>
         <p className="faint" style={{ fontSize: 12 }}>
-          Want to look around first? Run <code>npm run demo</code> in the Prism repo to connect a simulated app.
+          Want to look around first? Run <code>npm run demo</code> in the Loupe repo to connect a simulated app.
         </p>
       </div>
     </div>

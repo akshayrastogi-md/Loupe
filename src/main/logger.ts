@@ -4,7 +4,7 @@ const MAX_LOG_BYTES = 5 * 1024 * 1024
 
 /**
  * File + console logging. Logs live in the OS log directory
- * (~/Library/Logs/Prism DevTools on macOS) and rotate at 5 MB.
+ * (~/Library/Logs/Loupe on macOS) and rotate at 5 MB.
  */
 export function initLogging(): typeof log {
   log.initialize()

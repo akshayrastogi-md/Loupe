@@ -1,6 +1,6 @@
 import type { ClientMessage } from './protocol'
 
-/** The subset of @react-native-async-storage/async-storage that Prism needs. */
+/** The subset of @react-native-async-storage/async-storage that Loupe needs. */
 export interface AsyncStorageLike {
   getAllKeys(): Promise<readonly string[]>
   multiGet(keys: readonly string[]): Promise<ReadonlyArray<readonly [string, string | null]>>
@@ -33,7 +33,7 @@ export function installStorage(storage: AsyncStorageLike, send: (message: Client
         type: 'console',
         payload: {
           level: 'warn',
-          tag: 'prism',
+          tag: 'loupe',
           args: [`AsyncStorage snapshot failed: ${String(err)}`],
           timestamp: Date.now()
         }

@@ -1,6 +1,6 @@
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { IPC } from '@shared/ipc'
-import type { HubEvent, PrismBridge, ServerStatus } from '@shared/types'
+import type { HubEvent, LoupeBridge, ServerStatus } from '@shared/types'
 
 function subscribe<T>(channel: string, listener: (payload: T) => void): () => void {
   const handler = (_event: IpcRendererEvent, payload: T): void => listener(payload)
@@ -8,7 +8,7 @@ function subscribe<T>(channel: string, listener: (payload: T) => void): () => vo
   return () => ipcRenderer.removeListener(channel, handler)
 }
 
-const bridge: PrismBridge = {
+const bridge: LoupeBridge = {
   platform: process.platform,
   getInitialState: () => ipcRenderer.invoke(IPC.getInitialState),
   onHubEvents: (listener) => subscribe<HubEvent[]>(IPC.hubEvents, listener),
@@ -26,4 +26,4 @@ const bridge: PrismBridge = {
   openInEditor: (file, lineNumber) => ipcRenderer.invoke(IPC.openInEditor, file, lineNumber)
 }
 
-contextBridge.exposeInMainWorld('prism', bridge)
+contextBridge.exposeInMainWorld('loupe', bridge)

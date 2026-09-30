@@ -41,7 +41,7 @@ function StackTrace({ error }: { error: ErrorEntry }) {
 
   const symbolicate = async (): Promise<void> => {
     setLoading(true)
-    const result = await window.prism.symbolicate(raw).catch(() => null)
+    const result = await window.loupe.symbolicate(raw).catch(() => null)
     setLoading(false)
     if (result) {
       setSymbolicated(result)
@@ -51,7 +51,7 @@ function StackTrace({ error }: { error: ErrorEntry }) {
 
   const open = async (frame: StackFrame): Promise<void> => {
     if (frame.lineNumber === null) return
-    const res = await window.prism.openInEditor(frame.file, frame.lineNumber)
+    const res = await window.loupe.openInEditor(frame.file, frame.lineNumber)
     if (!res.ok) toast('error', res.error ?? 'Could not open file')
   }
 
@@ -115,7 +115,7 @@ export function ErrorsPanel() {
       <div className="panel">
         <EmptyState icon={<Bug size={22} />} title="No errors, nice">
           Uncaught JS exceptions (fatal and non-fatal) are captured automatically. Report caught errors and error
-          boundaries with <code>prism.reportError()</code>.
+          boundaries with <code>loupe.reportError()</code>.
         </EmptyState>
       </div>
     )

@@ -192,26 +192,26 @@ export function DevicePanel() {
               icon={<RefreshCw size={16} />}
               label="Reload via Metro"
               hint="All apps on Metro"
-              onClick={async () => report(await window.prism.metroCommand('reload'))}
+              onClick={async () => report(await window.loupe.metroCommand('reload'))}
             />
             <ToolButton
               icon={<Menu size={16} />}
               label="Dev menu via Metro"
               hint="All apps on Metro"
-              onClick={async () => report(await window.prism.metroCommand('devMenu'))}
+              onClick={async () => report(await window.loupe.metroCommand('devMenu'))}
             />
             <ToolButton
               icon={<Cable size={16} />}
               label="adb reverse"
-              hint="Forward Prism + Metro ports"
-              onClick={async () => report(await window.prism.adbReverse())}
+              hint="Forward Loupe + Metro ports"
+              onClick={async () => report(await window.loupe.adbReverse())}
             />
             <ToolButton
               icon={<TerminalSquare size={16} />}
               label="adb devices"
               hint="List Android devices"
               onClick={async () => {
-                const res = await window.prism.adbDevices()
+                const res = await window.loupe.adbDevices()
                 setAdbOutput(res.ok ? res.output || '(none)' : (res.error ?? 'Failed'))
               }}
             />
@@ -227,13 +227,13 @@ export function DevicePanel() {
           <div className="row">
             <span className="stat-label">Custom commands</span>
             <span className="faint" style={{ fontSize: 12 }}>
-              registered by the app with prism.registerCommand()
+              registered by the app with loupe.registerCommand()
             </span>
           </div>
           {device.commands.length === 0 ? (
             <div className="card card-body faint" style={{ fontSize: 12.5 }}>
               No commands registered. Expose actions like "Log out", "Reset onboarding" or "Seed test data":
-              <pre className="code" style={{ marginTop: 10 }}>{`prism.registerCommand({
+              <pre className="code" style={{ marginTop: 10 }}>{`loupe.registerCommand({
   id: 'logout',
   title: 'Log out',
   handler: () => store.dispatch(logout()),

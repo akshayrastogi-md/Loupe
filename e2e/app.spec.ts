@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-// A dedicated port and profile keep the suite isolated from a running Prism.
+// A dedicated port and profile keep the suite isolated from a running Loupe.
 const PORT = 19494
 const ROOT = join(__dirname, '..')
 
@@ -31,9 +31,9 @@ test.describe.configure({ mode: 'serial' })
 const nav = (label: string) => page.getByRole('button', { name: label, exact: true })
 
 test.beforeAll(async () => {
-  userData = mkdtempSync(join(tmpdir(), 'prism-e2e-'))
+  userData = mkdtempSync(join(tmpdir(), 'loupe-e2e-'))
   writeFileSync(
-    join(userData, 'prism-state.json'),
+    join(userData, 'loupe-state.json'),
     JSON.stringify({
       settings: { port: PORT, allowLan: false, theme: 'dark', maxEntries: 5000, metroPort: 8081 },
       mocks: [],

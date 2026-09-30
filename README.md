@@ -1,4 +1,4 @@
-# Prism DevTools
+# Loupe
 
 A desktop debugger for React Native. It shows network traffic, logs, state, storage, performance and errors for any RN app, and lets you mock APIs and throttle the network. It runs on macOS, Windows and Linux.
 
@@ -23,14 +23,14 @@ It also supports multiple devices at once, pausing capture, dark, light or syste
 2. **Add the SDK** to your React Native app. The full guide is in [client/README.md](client/README.md).
 
    ```bash
-   npm install --save-dev prism-devtools-client
+   npm install --save-dev loupe-rn
    ```
 
    ```ts
    import AsyncStorage from '@react-native-async-storage/async-storage'
-   import createPrism from 'prism-devtools-client'
+   import createLoupe from 'loupe-rn'
 
-   export const prism = createPrism({ appName: 'My App', asyncStorage: AsyncStorage }).connect()
+   export const loupe = createLoupe({ appName: 'My App', asyncStorage: AsyncStorage }).connect()
    ```
 
    The SDK does nothing in release builds (`enabled` defaults to `__DEV__`).
@@ -49,7 +49,7 @@ npm run dist         # installers: dmg/zip on macOS, NSIS on Windows, AppImage/d
 
 Unsigned local builds work. For distribution, set the signing and notarization variables described in [CONTRIBUTING.md](CONTRIBUTING.md#releasing), or push a `v*` tag to run the release workflow. To turn on auto-updates, fill in `publish` in `electron-builder.yml`.
 
-Logs are written to `~/Library/Logs/Prism DevTools` on macOS and `%APPDATA%\Prism DevTools\logs` on Windows. You can also use Help → Open Logs Folder.
+Logs are written to `~/Library/Logs/Loupe` on macOS and `%APPDATA%\Loupe\logs` on Windows. You can also use Help → Open Logs Folder.
 
 ## Quality
 

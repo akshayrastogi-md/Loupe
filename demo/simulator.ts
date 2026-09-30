@@ -1,5 +1,5 @@
 /**
- * Simulated React Native app for trying Prism without a device.
+ * Simulated React Native app for trying Loupe without a device.
  * Speaks the real wire protocol: network traffic, logs, errors, Redux-style
  * state, AsyncStorage, perf samples and custom commands. Honors mocks,
  * offline simulation, dispatch, time travel and storage edits from the desktop.
@@ -145,7 +145,7 @@ const ENDPOINTS: readonly Endpoint[] = [
 
 async function fakeRequest(): Promise<void> {
   const endpoint = pick(ENDPOINTS)
-  const url = endpoint.image ? 'https://picsum.photos/seed/prism/600/240' : `${URL_BASE}${endpoint.path}`
+  const url = endpoint.image ? 'https://picsum.photos/seed/loupe/600/240' : `${URL_BASE}${endpoint.path}`
   const reqId = id()
   const body = endpoint.gql
     ? JSON.stringify({ query: endpoint.gql, operationName: 'GetOrders' })
@@ -408,7 +408,7 @@ function handle(message: ServerMessage): void {
 function connect(): void {
   socket = new WebSocket(`ws://localhost:${PORT}`)
   socket.onopen = () => {
-    console.log(`[demo] connected to Prism on port ${PORT}`)
+    console.log(`[demo] connected to Loupe on port ${PORT}`)
     send({
       type: 'hello',
       payload: {

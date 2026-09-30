@@ -82,7 +82,7 @@ export interface PersistedState {
 }
 
 /** The API exposed to the renderer through the preload bridge. */
-export interface PrismBridge {
+export interface LoupeBridge {
   platform: string
   getInitialState(): Promise<PersistedState & { status: ServerStatus; devices: DeviceSummary[]; appVersion: string }>
   onHubEvents(listener: (events: HubEvent[]) => void): () => void

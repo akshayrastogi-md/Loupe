@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createPrism, type PrismClient } from './index'
+import { createLoupe, type LoupeClient } from './index'
 import { createTransport } from './transport'
 import { FakeSocket, FakeXHR, tick } from './testing'
 import type { MockRule } from './protocol'
@@ -85,9 +85,9 @@ describe('transport', () => {
   })
 })
 
-describe('createPrism', () => {
+describe('createLoupe', () => {
   let originalXhr: unknown
-  let prism: PrismClient
+  let loupe: LoupeClient
   let socket: FakeSocket
 
   beforeEach(() => {
@@ -95,7 +95,7 @@ describe('createPrism', () => {
     FakeXHR.sendCount = 0
     originalXhr = g.XMLHttpRequest
     g.XMLHttpRequest = FakeXHR
-    prism = createPrism({
+    loupe = createLoupe({
       appName: 'Test',
       host: 'localhost',
       console: false,
@@ -108,7 +108,7 @@ describe('createPrism', () => {
   })
 
   afterEach(() => {
-    prism.disconnect()
+    loupe.disconnect()
     g.XMLHttpRequest = originalXhr
   })
 
@@ -172,7 +172,7 @@ describe('createPrism', () => {
   })
 
   it('runs registered commands and reports results', async () => {
-    prism.registerCommand({
+    loupe.registerCommand({
       id: 'add',
       title: 'Add',
       args: [
@@ -181,7 +181,7 @@ describe('createPrism', () => {
       ],
       handler: ({ a, b }) => (a as number) + (b as number)
     })
-    prism.registerCommand({ id: 'boom', title: 'Boom', handler: () => Promise.reject(new Error('bad')) })
+    loupe.registerCommand({ id: 'boom', title: 'Boom', handler: () => Promise.reject(new Error('bad')) })
     expect(sent('commands.register').at(-1)?.payload.commands).toHaveLength(2)
     socket.receive({ type: 'command.run', payload: { commandId: 'add', runId: 'r1', args: { a: '2', b: 3 } } })
     socket.receive({ type: 'command.run', payload: { commandId: 'boom', runId: 'r2', args: {} } })
@@ -213,7 +213,7 @@ describe('createPrism', () => {
         replaceReducer: () => undefined
       }
     }
-    const store = prism.reduxEnhancer('main')(createStore as never)(reducer as never)
+    const store = loupe.reduxEnhancer('main')(createStore as never)(reducer as never)
     store.dispatch({ type: 'inc' })
     expect(sent('state.action')[0].payload).toMatchObject({
       store: 'main',
@@ -242,7 +242,7 @@ describe('createPrism', () => {
         return () => undefined
       }
     }
-    prism.trackZustand('ui', store)
+    loupe.trackZustand('ui', store)
     store.setState({ b: 2 })
     expect(sent('state.action')[0].payload.nextState).toEqual({ a: 1, b: 2 })
     socket.receive({ type: 'state.restore', payload: { store: 'ui', state: { a: 9 } } })
@@ -250,14 +250,14 @@ describe('createPrism', () => {
   })
 
   it('reports errors and tagged logs', () => {
-    prism.reportError(new Error('render failed'), 'in <App>')
-    prism.warn('careful', { x: 1 })
+    loupe.reportError(new Error('render failed'), 'in <App>')
+    loupe.warn('careful', { x: 1 })
     expect(sent('error')[0].payload).toMatchObject({
       message: 'render failed',
       componentStack: 'in <App>',
       isFatal: false
     })
-    expect(sent('console')[0].payload).toMatchObject({ level: 'warn', tag: 'prism', args: ['careful', { x: 1 }] })
+    expect(sent('console')[0].payload).toMatchObject({ level: 'warn', tag: 'loupe', args: ['careful', { x: 1 }] })
   })
 })
 
@@ -276,7 +276,7 @@ describe('asyncStorage bridge', () => {
       },
       clear: async () => data.clear()
     }
-    const prism = createPrism({
+    const loupe = createLoupe({
       host: 'h',
       network: false,
       console: false,
@@ -296,6 +296,6 @@ describe('asyncStorage bridge', () => {
     socket.receive({ type: 'storage.clear', payload: {} })
     await tick(5)
     expect(data.size).toBe(0)
-    prism.disconnect()
+    loupe.disconnect()
   })
 })

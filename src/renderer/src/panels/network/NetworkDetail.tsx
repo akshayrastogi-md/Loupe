@@ -81,7 +81,7 @@ export function NetworkDetail({ entry, onClose }: { entry: NetworkEntry; onClose
     setReplaying(true)
     try {
       setReplay(
-        await window.prism.replayRequest({
+        await window.loupe.replayRequest({
           url: request.url,
           method: request.method,
           headers: request.headers,

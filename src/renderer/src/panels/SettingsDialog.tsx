@@ -19,7 +19,7 @@ export function SettingsDialog() {
   const save = async (): Promise<void> => {
     setSaving(true)
     try {
-      const nextStatus = await window.prism.updateSettings(draft)
+      const nextStatus = await window.loupe.updateSettings(draft)
       setSettings(draft)
       setStatus(nextStatus)
       if (nextStatus.listening) {
@@ -52,7 +52,7 @@ export function SettingsDialog() {
         <div className="settings-title">Connection</div>
         <div className="form-grid">
           <label className="field">
-            <span>Prism port</span>
+            <span>Loupe port</span>
             <input
               className="input mono"
               type="number"

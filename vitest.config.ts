@@ -10,6 +10,7 @@ export default defineConfig({
       include: [
         'src/shared/**/*.ts',
         'src/main/server/**/*.ts',
+        'src/main/migrate.ts',
         'src/renderer/src/store/**/*.ts',
         'client/src/**/*.ts'
       ],

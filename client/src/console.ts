@@ -13,7 +13,7 @@ export function installConsole(send: (message: ClientMessage) => void): () => vo
   LEVELS.forEach((level) => {
     const original = originals[level]
     if (typeof original !== 'function') return
-    target[level] = function prismConsole(...args: unknown[]) {
+    target[level] = function loupeConsole(...args: unknown[]) {
       if (!reentrant) {
         reentrant = true
         try {

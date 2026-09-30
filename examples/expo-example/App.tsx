@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { StatusBar } from 'expo-status-bar'
-import { prism } from './src/prism'
+import { loupe } from './src/loupe'
 import { useCartStore } from './src/store'
 
 const API = 'https://jsonplaceholder.typicode.com'
@@ -62,8 +62,8 @@ export default function App() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Prism example</Text>
-      <Text style={styles.sub}>Prism connected: {String(prism.isConnected())}</Text>
+      <Text style={styles.title}>Loupe example</Text>
+      <Text style={styles.sub}>Loupe connected: {String(loupe.isConnected())}</Text>
       <Text style={styles.sub}>Cart items: {items.length}</Text>
       <View style={styles.row}>
         <Pressable style={styles.button} onPress={() => useCartStore.getState().add(`SKU-${Date.now() % 1000}`)}>
@@ -75,7 +75,7 @@ export default function App() {
             try {
               throw new Error('Handled error from the example app')
             } catch (err) {
-              prism.reportError(err)
+              loupe.reportError(err)
               console.error('Reported error', err)
             }
           }}

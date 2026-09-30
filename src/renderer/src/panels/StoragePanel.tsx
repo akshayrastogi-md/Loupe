@@ -147,7 +147,7 @@ export function StoragePanel() {
         <EmptyState icon={<Database size={22} />} title="AsyncStorage not connected">
           Pass your AsyncStorage instance to the SDK:{' '}
           <code>
-            createPrism({'{'} asyncStorage: AsyncStorage {'}'})
+            createLoupe({'{'} asyncStorage: AsyncStorage {'}'})
           </code>
         </EmptyState>
       ) : (

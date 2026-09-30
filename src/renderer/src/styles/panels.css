@@ -666,3 +666,18 @@ kbd {
   background: var(--bg-sunken);
   border: 1px solid var(--border);
 }
+
+.welcome-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 6px 10px;
+  max-width: 600px;
+  padding: 10px 14px;
+  border: 1px solid color-mix(in srgb, var(--red) 35%, transparent);
+  border-radius: var(--radius);
+  background: var(--red-soft);
+  color: var(--text);
+  font-size: 12.5px;
+}

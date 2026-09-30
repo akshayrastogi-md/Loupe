@@ -1,6 +1,6 @@
-appId: dev.prism.devtools
-productName: Prism DevTools
-copyright: Copyright © 2026 Prism DevTools contributors
+appId: dev.loupe.app
+productName: Loupe
+copyright: Copyright © 2026 Akshay Rastogi
 
 directories:
   buildResources: build
@@ -38,7 +38,7 @@ mac:
       arch: [arm64, x64]
 
 dmg:
-  artifactName: Prism-DevTools-${version}-${arch}.${ext}
+  artifactName: Loupe-${version}-${arch}.${ext}
 
 win:
   icon: build/icon.png
@@ -47,7 +47,7 @@ win:
       arch: [x64, arm64]
 
 nsis:
-  artifactName: Prism-DevTools-Setup-${version}-${arch}.${ext}
+  artifactName: Loupe-Setup-${version}-${arch}.${ext}
   oneClick: false
   perMachine: false
   allowToChangeInstallationDirectory: true
@@ -56,17 +56,17 @@ nsis:
 linux:
   icon: build/icon.png
   category: Development
-  maintainer: Prism DevTools contributors
+  maintainer: Akshay Rastogi
   target:
     - AppImage
     - deb
 
 appImage:
-  artifactName: Prism-DevTools-${version}-${arch}.${ext}
+  artifactName: Loupe-${version}-${arch}.${ext}
 
 # Auto-update: uncomment and fill in to publish releases (e.g. GitHub Releases).
 # The app enables electron-updater only when this is configured.
 # publish:
 #   provider: github
 #   owner: your-org
-#   repo: prism-devtools
+#   repo: loupe-devtools

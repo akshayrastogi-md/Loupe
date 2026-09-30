@@ -8,7 +8,7 @@ npm run dev     # desktop app with hot reload
 npm run demo    # simulated React Native app (in a second terminal)
 ```
 
-To test against a real app, see `examples/expo-example`. It installs the packed SDK: run `npm pack` in `client/`, then `npm i ../prism-devtools-client-*.tgz` in the example.
+To test against a real app, see `examples/expo-example`. It installs the packed SDK: run `npm pack` in `client/`, then `npm i ../loupe-rn-*.tgz` in the example.
 
 ## Before opening a PR
 

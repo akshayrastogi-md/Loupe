@@ -42,7 +42,7 @@ export class Persistence {
   private writeChain: Promise<void> = Promise.resolve()
 
   constructor(directory: string) {
-    this.file = join(directory, 'prism-state.json')
+    this.file = join(directory, 'loupe-state.json')
   }
 
   async load(): Promise<PersistedState> {

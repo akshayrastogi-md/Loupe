@@ -20,7 +20,7 @@ import { serialize } from './serialize'
 export * from './protocol'
 export type { StoreAdapter, AsyncStorageLike }
 
-export interface PrismOptions {
+export interface LoupeOptions {
   /**
    * Master switch. Defaults to `__DEV__`, so the SDK is inert in release builds
    * even if the call site is not guarded.
@@ -45,8 +45,8 @@ export interface CustomCommand extends CommandDescriptor {
   handler: (args: Record<string, unknown>) => unknown | Promise<unknown>
 }
 
-export interface PrismClient {
-  connect(): PrismClient
+export interface LoupeClient {
+  connect(): LoupeClient
   disconnect(): void
   isConnected(): boolean
   log(...args: unknown[]): void
@@ -64,7 +64,7 @@ const DEFAULT_IGNORED = ['clients3.google.com/generate_204']
 
 /**
  * Hosts to try, in order: the Metro host (right for LAN devices), then
- * localhost (iOS simulator) and 10.0.2.2 (Android emulator). Prism listens on
+ * localhost (iOS simulator) and 10.0.2.2 (Android emulator). Loupe listens on
  * localhost by default, so Expo's LAN-IP bundle URL alone would not connect.
  */
 function candidateHosts(): string[] {
@@ -88,8 +88,8 @@ const identityEnhancer = ((createStore: unknown) => createStore) as ReturnType<t
 const noop = (): void => undefined
 
 /** Inert client returned when the SDK is disabled: no patching, no sockets. */
-function createNoopClient(): PrismClient {
-  const client: PrismClient = {
+function createNoopClient(): LoupeClient {
+  const client: LoupeClient = {
     connect: () => client,
     disconnect: noop,
     isConnected: () => false,
@@ -105,7 +105,7 @@ function createNoopClient(): PrismClient {
   return client
 }
 
-export function createPrism(options: PrismOptions = {}): PrismClient {
+export function createLoupe(options: LoupeOptions = {}): LoupeClient {
   if (!(options.enabled ?? isDevBuild())) return createNoopClient()
   const appName = options.appName ?? 'React Native App'
   const hosts = options.host ? [options.host] : candidateHosts()
@@ -191,7 +191,7 @@ export function createPrism(options: PrismOptions = {}): PrismClient {
         void runCommand(message.payload.commandId, message.payload.runId, message.payload.args)
         return
       case 'app.reload':
-        getReactNative()?.DevSettings?.reload('Prism DevTools')
+        getReactNative()?.DevSettings?.reload('Loupe')
         return
       case 'app.devMenu':
         getReactNative()?.DevSettings?.openDevMenu?.()
@@ -215,10 +215,10 @@ export function createPrism(options: PrismOptions = {}): PrismClient {
   const tagged = (level: 'log' | 'warn' | 'error', args: unknown[]): void =>
     send({
       type: 'console',
-      payload: { level, tag: 'prism', args: args.map((a) => serialize(a)), timestamp: Date.now() }
+      payload: { level, tag: 'loupe', args: args.map((a) => serialize(a)), timestamp: Date.now() }
     })
 
-  const client: PrismClient = {
+  const client: LoupeClient = {
     connect() {
       if (uninstallers.length) return client
       if (options.network !== false) {
@@ -277,4 +277,4 @@ export function createPrism(options: PrismOptions = {}): PrismClient {
   return client
 }
 
-export default createPrism
+export default createLoupe

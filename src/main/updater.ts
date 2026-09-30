@@ -30,7 +30,7 @@ export function initAutoUpdates(getWindow: () => BrowserWindow | null): void {
       type: 'info' as const,
       buttons: ['Restart now', 'Later'],
       defaultId: 0,
-      message: `Prism DevTools ${info.version} is ready to install`,
+      message: `Loupe ${info.version} is ready to install`,
       detail: 'Restart to finish updating.'
     }
     const { response } = win ? await dialog.showMessageBox(win, options) : await dialog.showMessageBox(options)

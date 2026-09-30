@@ -1,7 +1,7 @@
 {
-  "name": "prism-devtools-client",
+  "name": "loupe-rn",
   "version": "0.1.0",
-  "description": "React Native client SDK for Prism DevTools: network inspector, logs, state, storage, performance, mocks.",
+  "description": "React Native client SDK for Loupe: network inspector, logs, state, storage, performance, mocks.",
   "keywords": [
     "react-native",
     "devtools",
@@ -42,5 +42,14 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akshayrastogi-md/Loupe.git",
+    "directory": "client"
+  },
+  "homepage": "https://github.com/akshayrastogi-md/Loupe#readme",
+  "bugs": {
+    "url": "https://github.com/akshayrastogi-md/Loupe/issues"
   }
 }

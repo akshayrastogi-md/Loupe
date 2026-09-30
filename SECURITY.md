@@ -6,7 +6,7 @@ Please report vulnerabilities privately through your repository host's security 
 
 ## Threat model
 
-Prism runs a WebSocket server that development builds of React Native apps connect to.
+Loupe runs a WebSocket server that development builds of React Native apps connect to.
 
 **Network exposure**
 - By default it listens on `127.0.0.1` only. "Allow LAN connections" exposes it to your local network; only turn it on for trusted networks.

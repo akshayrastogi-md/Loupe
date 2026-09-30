@@ -1,10 +1,10 @@
 {
-  "name": "prism-devtools",
-  "productName": "Prism DevTools",
+  "name": "loupe",
+  "productName": "Loupe",
   "version": "0.1.0",
   "description": "A professional desktop devtool for React Native developers: network inspector, logs, state, storage, performance and more.",
   "main": "./out/main/index.js",
-  "author": "Prism",
+  "author": "Akshay Rastogi",
   "license": "MIT",
   "private": true,
   "scripts": {
@@ -67,5 +67,13 @@
   },
   "engines": {
     "node": ">=22"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akshayrastogi-md/Loupe.git"
+  },
+  "homepage": "https://github.com/akshayrastogi-md/Loupe#readme",
+  "bugs": {
+    "url": "https://github.com/akshayrastogi-md/Loupe/issues"
   }
 }

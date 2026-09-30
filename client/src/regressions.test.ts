@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { createPrism, type PrismClient } from './index'
+import { createLoupe, type LoupeClient } from './index'
 import { createTransport } from './transport'
 import { FakeSocket, FakeXHR, tick } from './testing'
 import type { MockRule } from './protocol'
@@ -49,7 +49,7 @@ describe('transport socket lifecycle', () => {
 
 describe('network safety', () => {
   let originalXhr: unknown
-  let prism: PrismClient
+  let loupe: LoupeClient
   let socket: FakeSocket
 
   beforeEach(() => {
@@ -57,7 +57,7 @@ describe('network safety', () => {
     FakeXHR.sendCount = 0
     originalXhr = g.XMLHttpRequest
     g.XMLHttpRequest = FakeXHR
-    prism = createPrism({
+    loupe = createLoupe({
       host: 'h',
       console: false,
       performance: false,
@@ -69,7 +69,7 @@ describe('network safety', () => {
   })
 
   afterEach(() => {
-    prism.disconnect()
+    loupe.disconnect()
     g.XMLHttpRequest = originalXhr
   })
 
@@ -162,7 +162,7 @@ describe('host fallback', () => {
 describe('fetch capture', () => {
   const realFetch = globalThis.fetch
   let socket: FakeSocket
-  let prism: PrismClient
+  let loupe: LoupeClient
   let originalXhr: unknown
 
   const setup = (fetchImpl: typeof fetch): void => {
@@ -170,7 +170,7 @@ describe('fetch capture', () => {
     originalXhr = g.XMLHttpRequest
     g.XMLHttpRequest = FakeXHR
     globalThis.fetch = fetchImpl
-    prism = createPrism({
+    loupe = createLoupe({
       host: 'h',
       console: false,
       performance: false,
@@ -182,7 +182,7 @@ describe('fetch capture', () => {
   }
 
   afterEach(() => {
-    prism.disconnect()
+    loupe.disconnect()
     globalThis.fetch = realFetch
     g.XMLHttpRequest = originalXhr
   })

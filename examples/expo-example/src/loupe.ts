@@ -1,13 +1,13 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import createPrism from 'prism-devtools-client'
+import createLoupe from 'loupe-rn'
 import { useCartStore } from './store'
 
 // Inert in release builds: `enabled` defaults to __DEV__.
-export const prism = createPrism({ appName: 'Prism Example', asyncStorage: AsyncStorage }).connect()
+export const loupe = createLoupe({ appName: 'Loupe Example', asyncStorage: AsyncStorage }).connect()
 
-prism.trackZustand('cart', useCartStore)
+loupe.trackZustand('cart', useCartStore)
 
-prism.registerCommand({
+loupe.registerCommand({
   id: 'clear-cart',
   title: 'Clear cart',
   description: 'Empties the Zustand cart store.',
@@ -17,7 +17,7 @@ prism.registerCommand({
   }
 })
 
-prism.registerCommand({
+loupe.registerCommand({
   id: 'add-items',
   title: 'Add items',
   description: 'Adds N items to the cart.',

@@ -14,7 +14,7 @@ export const MAX_COMMAND_RESULTS = 100
 
 export interface LogEntry extends ConsolePayload {
   id: string
-  /** Synthetic entries inserted by Prism itself (e.g. "App reloaded"). */
+  /** Synthetic entries inserted by Loupe itself (e.g. "App reloaded"). */
   system?: boolean
 }
 export interface ErrorEntry extends ErrorPayload {

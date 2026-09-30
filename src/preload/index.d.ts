@@ -1,8 +1,8 @@
-import type { PrismBridge } from '../shared/types'
+import type { LoupeBridge } from '../shared/types'
 
 declare global {
   interface Window {
-    prism: PrismBridge
+    loupe: LoupeBridge
   }
 }
 

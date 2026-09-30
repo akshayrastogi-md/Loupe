@@ -1,5 +1,5 @@
 /**
- * Prism wire protocol. This file is the single source of truth for messages
+ * Loupe wire protocol. This file is the single source of truth for messages
  * exchanged between the React Native client SDK and the desktop app.
  */
 

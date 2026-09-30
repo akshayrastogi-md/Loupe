@@ -34,7 +34,7 @@ export const PANELS: ReadonlyArray<{ id: PanelId; label: string; icon: typeof Gl
   { id: 'device', label: 'Device & Commands', icon: Smartphone }
 ]
 
-const modKey = (): string => (window.prism?.platform === 'darwin' ? '⌘' : 'Ctrl+')
+const modKey = (): string => (window.loupe?.platform === 'darwin' ? '⌘' : 'Ctrl+')
 
 export function PlatformIcon({ platform, size = 14 }: { platform: Platform; size?: number }) {
   return (
@@ -129,13 +129,13 @@ export function TitleBar() {
   const conditions = useAppStore((s) => s.conditions)
   const activeMocks = useAppStore((s) => s.mocks.filter((m) => m.enabled).length)
   const setPanel = useAppStore((s) => s.setPanel)
-  const isMac = window.prism?.platform === 'darwin'
+  const isMac = window.loupe?.platform === 'darwin'
 
   return (
     <header className={`titlebar drag${isMac ? ' mac' : ''}`}>
       <div className="brand">
         <span className="brand-mark" />
-        Prism
+        Loupe
       </div>
       <DevicePicker />
       <span className="spacer" />

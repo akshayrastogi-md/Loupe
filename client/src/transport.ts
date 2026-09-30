@@ -46,7 +46,7 @@ export function createTransport(options: TransportOptions): Transport {
   const createSocket: WebSocketFactory =
     options.createSocket ??
     ((url) => {
-      if (!NativeWebSocket) throw new Error('[prism] WebSocket is not available in this environment')
+      if (!NativeWebSocket) throw new Error('[loupe] WebSocket is not available in this environment')
       return new NativeWebSocket(url)
     })
 

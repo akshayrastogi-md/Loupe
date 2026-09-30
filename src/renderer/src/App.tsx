@@ -20,7 +20,7 @@ function useBootstrap(): void {
   useEffect(() => {
     const store = useAppStore.getState()
     let disposed = false
-    window.prism
+    window.loupe
       .getInitialState()
       .then((initial) => {
         if (disposed) return
@@ -36,8 +36,8 @@ function useBootstrap(): void {
         if (!initial.status.listening) toast('error', `Server not running: ${initial.status.error ?? 'unknown error'}`)
       })
       .catch((err: Error) => toast('error', `Failed to initialize: ${err.message}`))
-    const offEvents = window.prism.onHubEvents((events) => useAppStore.getState().applyHubEvents(events))
-    const offStatus = window.prism.onServerStatus((status) => useAppStore.getState().setStatus(status))
+    const offEvents = window.loupe.onHubEvents((events) => useAppStore.getState().applyHubEvents(events))
+    const offStatus = window.loupe.onServerStatus((status) => useAppStore.getState().setStatus(status))
     return () => {
       disposed = true
       offEvents()

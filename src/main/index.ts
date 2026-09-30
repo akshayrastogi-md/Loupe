@@ -8,6 +8,7 @@ import { registerIpc } from './ipc'
 import { buildMenu } from './menu'
 import { loadWindowState, trackWindowState } from './windowState'
 import { initAutoUpdates } from './updater'
+import { migrateLegacyData } from './migrate'
 
 initLogging()
 
@@ -70,7 +71,7 @@ function createWindow(): void {
     minHeight: 640,
     show: false,
     backgroundColor: '#0b0d12',
-    title: 'Prism DevTools',
+    title: 'Loupe',
     titleBarStyle: isMac ? 'hiddenInset' : 'default',
     trafficLightPosition: { x: 14, y: 14 },
     webPreferences: {
@@ -112,7 +113,7 @@ function createWindow(): void {
       return
     }
     dialog.showErrorBox(
-      'Prism DevTools crashed',
+      'Loupe crashed',
       `The window crashed repeatedly (${details.reason}). Logs: ${app.getPath('logs')}`
     )
   })
@@ -129,7 +130,8 @@ app.on('second-instance', () => {
 app
   .whenReady()
   .then(async () => {
-    log.info(`Prism DevTools ${app.getVersion()} starting (electron ${process.versions.electron})`)
+    log.info(`Loupe ${app.getVersion()} starting (electron ${process.versions.electron})`)
+    migrateLegacyData(app.getPath('appData'), app.getPath('userData'))
     const state = await persistence.load()
     registerIpc({ hub, persistence, getWindow: () => mainWindow })
     buildMenu(() => mainWindow)
@@ -144,7 +146,7 @@ app
   })
   .catch((err: Error) => {
     log.error('Fatal startup error', err)
-    dialog.showErrorBox('Prism DevTools failed to start', err.message)
+    dialog.showErrorBox('Loupe failed to start', err.message)
     app.exit(1)
   })
 

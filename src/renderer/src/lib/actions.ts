@@ -13,7 +13,7 @@ export async function sendToSelected(message: ServerMessage): Promise<boolean> {
     return false
   }
   try {
-    const ok = await window.prism.sendToDevice(device.summary.id, message)
+    const ok = await window.loupe.sendToDevice(device.summary.id, message)
     if (!ok) toast('error', 'Device is no longer connected')
     return ok
   } catch (err) {
@@ -33,7 +33,7 @@ export async function copyText(text: string, label = 'Copied to clipboard'): Pro
 
 export async function saveFile(name: string, content: string): Promise<void> {
   try {
-    const saved = await window.prism.saveFile(name, content)
+    const saved = await window.loupe.saveFile(name, content)
     if (saved) toast('success', `Saved ${name}`)
   } catch (err) {
     toast('error', `Save failed: ${(err as Error).message}`)

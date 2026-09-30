@@ -10,7 +10,7 @@ export function getBundleUrl(rn: ReactNativeModule | null = getReactNative()): s
   return sourceCode?.scriptURL ?? sourceCode?.getConstants?.().scriptURL
 }
 
-/** Metro's bundle URL host is the dev machine, which is also where Prism runs. */
+/** Metro's bundle URL host is the dev machine, which is also where Loupe runs. */
 export function detectHost(rn: ReactNativeModule | null = getReactNative()): string {
   const url = getBundleUrl(rn)
   const match = url?.match(/^https?:\/\/([^:/]+)/)

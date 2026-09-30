@@ -125,14 +125,14 @@ describe('packaging', () => {
   })
 
   it('returns an inert client when disabled', async () => {
-    const { createPrism } = await import('./index')
+    const { createLoupe } = await import('./index')
     const createSocket = vi.fn()
     const originalFetch = globalThis.fetch
-    const prism = createPrism({ enabled: false, createSocket }).connect()
+    const loupe = createLoupe({ enabled: false, createSocket }).connect()
     expect(createSocket).not.toHaveBeenCalled()
     expect(globalThis.fetch).toBe(originalFetch)
     const createStore = (): { ok: boolean } => ({ ok: true })
-    expect(prism.reduxEnhancer()(createStore as never)).toBe(createStore)
-    expect(prism.isConnected()).toBe(false)
+    expect(loupe.reduxEnhancer()(createStore as never)).toBe(createStore)
+    expect(loupe.isConnected()).toBe(false)
   })
 })

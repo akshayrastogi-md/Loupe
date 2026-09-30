@@ -8,7 +8,7 @@ All notable changes to this project are documented here. The format follows [Kee
 - **Desktop app panels:**
   - Network: waterfall, filters, HAR export, cURL/fetch copy, replay, create a mock from a request.
   - Console, State (diffs, dispatch, time travel), Storage, Performance, Errors (with symbolication), Mocks and Throttling, Device and Commands.
-- **React Native SDK** (`prism-devtools-client`):
+- **React Native SDK** (`loupe-rn`):
   - Captures XHR and native fetch, console, errors, Redux/Zustand/custom stores, AsyncStorage, performance and custom commands.
   - Does nothing in release builds.
   - Falls back through several hosts (Metro host, `localhost`, `10.0.2.2`).

@@ -9,7 +9,7 @@ export function toHar(entries: readonly NetworkEntry[], creatorVersion: string):
   const har = {
     log: {
       version: '1.2',
-      creator: { name: 'Prism DevTools', version: creatorVersion },
+      creator: { name: 'Loupe', version: creatorVersion },
       entries: entries.map((entry) => {
         const { request, response } = entry
         const time = entryDuration(entry) ?? 0

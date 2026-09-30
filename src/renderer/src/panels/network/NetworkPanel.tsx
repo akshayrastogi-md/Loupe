@@ -74,7 +74,7 @@ export function NetworkPanel() {
   }
 
   const exportHar = (): void => {
-    const name = `${device?.summary.info.appName ?? 'prism'}-${new Date().toISOString().replace(/[:.]/g, '-')}.har`
+    const name = `${device?.summary.info.appName ?? 'loupe'}-${new Date().toISOString().replace(/[:.]/g, '-')}.har`
     void saveFile(name, toHar(entries, appVersion))
   }
 
