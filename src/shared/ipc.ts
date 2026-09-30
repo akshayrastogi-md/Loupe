@@ -12,5 +12,6 @@ export const IPC = {
   metroCommand: 'loupe:metro-command',
   adbReverse: 'loupe:adb-reverse',
   adbDevices: 'loupe:adb-devices',
-  openInEditor: 'loupe:open-in-editor'
+  openInEditor: 'loupe:open-in-editor',
+  openDebugger: 'loupe:open-debugger'
 } as const

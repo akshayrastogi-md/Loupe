@@ -98,6 +98,7 @@ export interface LoupeBridge {
   adbReverse(): Promise<CommandResult>
   adbDevices(): Promise<CommandResult>
   openInEditor(file: string, lineNumber: number): Promise<CommandResult>
+  openDebugger(panel?: 'console' | 'sources' | 'memory' | 'timeline'): Promise<CommandResult>
 }
 
 export type { CommandDescriptor }

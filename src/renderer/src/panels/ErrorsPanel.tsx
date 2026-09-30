@@ -66,6 +66,16 @@ function StackTrace({ error }: { error: ErrorEntry }) {
         <button className="btn sm" onClick={symbolicate} disabled={loading || !raw.length || Boolean(symbolicated)}>
           <Sparkles size={12} /> {symbolicated ? 'Symbolicated' : loading ? 'Symbolicating…' : 'Symbolicate'}
         </button>
+        <button
+          className="btn sm"
+          title="Open React Native DevTools to set breakpoints"
+          onClick={async () => {
+            const res = await window.loupe.openDebugger('sources')
+            if (!res.ok) toast('error', res.error ?? 'Could not open debugger')
+          }}
+        >
+          <Bug size={12} /> Debug
+        </button>
       </div>
       {frames.length === 0 ? (
         <pre className="code">{error.stack ?? 'No stack trace available'}</pre>

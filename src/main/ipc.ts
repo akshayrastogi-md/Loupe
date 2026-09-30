@@ -5,7 +5,7 @@ import { IPC } from '@shared/ipc'
 import type { ServerMessage } from '@shared/protocol'
 import type { DeviceHub } from './server/hub'
 import { conditionsSchema, mockRuleSchema, settingsSchema, type Persistence } from './persistence'
-import { adbDevices, adbReverse, metroCommand, openInEditor, replayRequest, symbolicate } from './tools'
+import { adbDevices, adbReverse, metroCommand, openDebugger, openInEditor, replayRequest, symbolicate } from './tools'
 
 const SERVER_MESSAGE_TYPES = [
   'state.request',
@@ -117,6 +117,13 @@ export function registerIpc({ hub, persistence, getWindow }: IpcDeps): void {
 
   ipcMain.handle(IPC.metroCommand, (_e, command: unknown) =>
     metroCommand(metroPort(), parse(z.enum(['reload', 'devMenu']), command, 'metro command'))
+  )
+
+  ipcMain.handle(IPC.openDebugger, (_e, panel: unknown) =>
+    openDebugger(
+      metroPort(),
+      parse(z.enum(['console', 'sources', 'memory', 'timeline']).optional(), panel ?? undefined, 'debugger panel')
+    )
   )
 
   ipcMain.handle(IPC.adbReverse, () => adbReverse([persistence.get().settings.port, metroPort()]))

@@ -23,7 +23,8 @@ const bridge: LoupeBridge = {
   metroCommand: (command) => ipcRenderer.invoke(IPC.metroCommand, command),
   adbReverse: () => ipcRenderer.invoke(IPC.adbReverse),
   adbDevices: () => ipcRenderer.invoke(IPC.adbDevices),
-  openInEditor: (file, lineNumber) => ipcRenderer.invoke(IPC.openInEditor, file, lineNumber)
+  openInEditor: (file, lineNumber) => ipcRenderer.invoke(IPC.openInEditor, file, lineNumber),
+  openDebugger: (panel) => ipcRenderer.invoke(IPC.openDebugger, panel)
 }
 
 contextBridge.exposeInMainWorld('loupe', bridge)

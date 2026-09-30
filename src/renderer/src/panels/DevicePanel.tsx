@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Cable, Menu, Play, RefreshCw, Smartphone, TerminalSquare, Zap } from 'lucide-react'
+import { Bug, Cable, Cpu, Menu, Play, RefreshCw, Smartphone, TerminalSquare, Zap } from 'lucide-react'
 import type { CommandDescriptor } from '@shared/protocol'
 import { formatTime, previewValue } from '@shared/format'
 import type { CommandResult } from '@shared/types'
@@ -174,6 +174,18 @@ export function DevicePanel() {
         <div className="card">
           <div className="card-head">App controls</div>
           <div className="card-body tool-grid">
+            <ToolButton
+              icon={<Bug size={16} />}
+              label="Open JS debugger"
+              hint="Breakpoints, profiler (Hermes)"
+              onClick={async () => report(await window.loupe.openDebugger('sources'))}
+            />
+            <ToolButton
+              icon={<Cpu size={16} />}
+              label="Memory & profiler"
+              hint="Heap snapshots"
+              onClick={async () => report(await window.loupe.openDebugger('memory'))}
+            />
             <ToolButton
               icon={<RefreshCw size={16} />}
               label="Reload app"

@@ -114,6 +114,27 @@ export async function symbolicate(metroPort: number, frames: StackFrame[]): Prom
   }
 }
 
+/**
+ * Open React Native DevTools (breakpoints, profiler) via Metro's
+ * /open-debugger endpoint, for the most recently connected Hermes app.
+ */
+export async function openDebugger(metroPort: number, panel?: string): Promise<CommandResult> {
+  const query = panel ? `?panel=${encodeURIComponent(panel)}` : ''
+  try {
+    const res = await fetch(`http://localhost:${metroPort}/open-debugger${query}`, {
+      method: 'POST',
+      signal: AbortSignal.timeout(METRO_TIMEOUT_MS)
+    })
+    if (res.ok) return { ok: true, output: 'Opened React Native DevTools' }
+    if (res.status === 404) {
+      return { ok: false, error: 'No debuggable app is connected to Metro. React Native DevTools needs Hermes.' }
+    }
+    return { ok: false, error: `Metro responded ${res.status}` }
+  } catch (err) {
+    return { ok: false, error: `Cannot reach Metro on port ${metroPort}: ${(err as Error).message}` }
+  }
+}
+
 export async function openInEditor(metroPort: number, file: string, lineNumber: number): Promise<CommandResult> {
   try {
     const res = await postToMetro(metroPort, '/open-stack-frame', { file, lineNumber })
