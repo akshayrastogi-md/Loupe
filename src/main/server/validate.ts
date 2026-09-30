@@ -78,6 +78,28 @@ const schemas = {
     truncated: z.boolean().optional(),
     timestamp
   }),
+  'query.snapshot': z.object({
+    client: safeKey,
+    timestamp,
+    queries: z
+      .array(
+        z.object({
+          hash: z.string().max(8192),
+          key: z.unknown(),
+          status: z.enum(['pending', 'error', 'success']),
+          fetchStatus: z.enum(['fetching', 'paused', 'idle']),
+          isStale: z.boolean(),
+          isInvalidated: z.boolean(),
+          observers: z.number().int().nonnegative(),
+          dataUpdatedAt: z.number(),
+          errorUpdatedAt: z.number(),
+          failureCount: z.number().int().nonnegative(),
+          error: z.string().optional(),
+          data: z.unknown().optional()
+        })
+      )
+      .max(1000)
+  }),
   console: z.object({
     level: z.enum(['debug', 'log', 'info', 'warn', 'error']),
     args: z.array(z.unknown()),

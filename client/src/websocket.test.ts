@@ -46,7 +46,11 @@ describe('installWebSocket', () => {
     g.WebSocket = FakeWS
     sent = []
     seq = 0
-    api = installWebSocket({ send: (m) => sent.push(m), nextId: () => `s${seq++}`, ignoreUrls: ['//localhost:8081/hot'] })
+    api = installWebSocket({
+      send: (m) => sent.push(m),
+      nextId: () => `s${seq++}`,
+      ignoreUrls: ['//localhost:8081/hot']
+    })
   })
 
   afterEach(() => {

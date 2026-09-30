@@ -4,6 +4,7 @@ import type {
   ConsolePayload,
   ErrorPayload,
   PerfSamplePayload,
+  QuerySnapshotPayload,
   SocketFramePayload,
   SocketStatus,
   StateActionPayload
@@ -52,6 +53,8 @@ export interface DeviceState {
   disconnectedAt?: number
   network: { order: string[]; byId: Record<string, NetworkEntry> }
   sockets: { order: string[]; byId: Record<string, SocketEntry> }
+  /** Latest TanStack Query cache snapshot per tracked client. */
+  queries: Record<string, QuerySnapshotPayload>
   logs: LogEntry[]
   errors: ErrorEntry[]
   actions: ActionEntry[]
@@ -74,6 +77,7 @@ export function createDeviceState(summary: DeviceSummary): DeviceState {
     connected: true,
     network: { order: [], byId: {} },
     sockets: { order: [], byId: {} },
+    queries: {},
     logs: [],
     errors: [],
     actions: [],
@@ -174,6 +178,9 @@ function applyMessage(draft: Draft, event: Extract<HubEvent, { kind: 'message' }
       }
       return
     }
+    case 'query.snapshot':
+      draft.device.queries = { ...draft.device.queries, [message.payload.client]: message.payload }
+      return
     case 'console':
       ;(touch(draft, 'logs') as LogEntry[]).push({ ...message.payload, id: nextId() })
       return

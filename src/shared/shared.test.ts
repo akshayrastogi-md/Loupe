@@ -226,3 +226,18 @@ describe('header text', () => {
     expect(textToHeaders('A: 1\n\nnot a header\n: empty\nB:  x: y ')).toEqual({ a: '1', b: 'x: y' })
   })
 })
+
+describe('query status', () => {
+  const base = { fetchStatus: 'idle' as const, status: 'success' as const, observers: 1, isStale: false }
+  it('derives the devtools state in priority order', async () => {
+    const { queryState, queryKeyLabel } = await import('./queryStatus')
+    expect(queryState({ ...base, fetchStatus: 'fetching', status: 'error' })).toBe('fetching')
+    expect(queryState({ ...base, fetchStatus: 'paused' })).toBe('paused')
+    expect(queryState({ ...base, status: 'error', observers: 0 })).toBe('error')
+    expect(queryState({ ...base, observers: 0, isStale: true })).toBe('inactive')
+    expect(queryState({ ...base, isStale: true })).toBe('stale')
+    expect(queryState(base)).toBe('fresh')
+    expect(queryKeyLabel(['user', 7, { page: 2 }])).toBe('user › 7 › {"page":2}')
+    expect(queryKeyLabel('solo')).toBe('"solo"')
+  })
+})

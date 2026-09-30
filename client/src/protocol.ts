@@ -80,6 +80,29 @@ export interface SocketFramePayload {
   timestamp: number
 }
 
+export interface QuerySummary {
+  hash: string
+  key: unknown
+  status: 'pending' | 'error' | 'success'
+  fetchStatus: 'fetching' | 'paused' | 'idle'
+  isStale: boolean
+  isInvalidated: boolean
+  observers: number
+  dataUpdatedAt: number
+  errorUpdatedAt: number
+  failureCount: number
+  error?: string
+  data?: unknown
+}
+
+export interface QuerySnapshotPayload {
+  client: string
+  queries: QuerySummary[]
+  timestamp: number
+}
+
+export type QueryAction = 'refetch' | 'invalidate' | 'reset' | 'remove'
+
 export type LogLevel = 'debug' | 'log' | 'info' | 'warn' | 'error'
 
 export interface ConsolePayload {
@@ -180,6 +203,7 @@ export type ClientMessage =
   | { type: 'ws.open'; payload: SocketOpenPayload }
   | { type: 'ws.status'; payload: SocketStatusPayload }
   | { type: 'ws.frame'; payload: SocketFramePayload }
+  | { type: 'query.snapshot'; payload: QuerySnapshotPayload }
   | { type: 'console'; payload: ConsolePayload }
   | { type: 'error'; payload: ErrorPayload }
   | { type: 'state.action'; payload: StateActionPayload }
@@ -203,6 +227,7 @@ export type ServerMessage =
   | { type: 'command.run'; payload: { commandId: string; runId: string; args: Record<string, unknown> } }
   | { type: 'network.resend'; payload: ResendRequest }
   | { type: 'ws.send'; payload: { id: string; data: string } }
+  | { type: 'query.action'; payload: { client: string; action: QueryAction; hash?: string } }
   | { type: 'app.reload'; payload: Record<string, never> }
   | { type: 'app.devMenu'; payload: Record<string, never> }
 

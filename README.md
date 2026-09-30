@@ -6,8 +6,9 @@ A desktop debugger for React Native. It shows network traffic, logs, state, stor
 
 | Panel | What you get |
 |---|---|
-| **Network** | Every `fetch`/XHR/axios request (native fetch and the XHR polyfill), with status, method, host, type, size, time and a waterfall. You can filter by text, `status:404`, type, method, failed-only or mocked-only. The detail pane shows headers, query params, payload, a searchable JSON tree of the response, image preview and timing. Copy as **cURL** or **fetch()**, **Replay** a request, **Mock** it from the captured response, or **Export HAR**. GraphQL operation names are detected. |
+| **Network** | Every `fetch`/XHR/axios request (native fetch and the XHR polyfill), with status, method, host, type, size, time and a waterfall. You can filter by text, `status:404`, type, method, failed-only or mocked-only. The detail pane shows headers, query params, payload, a searchable JSON tree of the response, image preview and timing. Copy as **cURL** or **fetch()**, **Replay** a request, **Mock** it from the captured response, or **Export HAR**. GraphQL operation names are detected. **WebSockets:** connections and frames in both directions, and you can send frames into a live socket. **Edit & resend** from the device or desktop, and **Export HAR** with secrets hidden. |
 | **Console** | Streams `console.*` output with level filters, search, expandable objects and collapsible long lines. History is kept across app reloads. |
+| **Queries** | TanStack Query cache: fresh, fetching, stale, inactive and error states, data and details, plus refetch, invalidate, reset or remove per query or for all. |
 | **State** | Redux, Zustand or any store: an action log with timings, **diffs**, **dispatch** from the desktop, and **time travel**. |
 | **Storage** | View, edit, add, delete and clear AsyncStorage keys. The view refreshes automatically when the app writes. |
 | **Performance** | Live JS frame rate, event-loop lag and Hermes heap. |
@@ -15,7 +16,7 @@ A desktop debugger for React Native. It shows network traffic, logs, state, stor
 | **Mocks & Throttling** | Mock rules by URL (contains, equals or regex) plus method, with status, headers, body and delay. Also **offline simulation** and latency presets. |
 | **Device & Commands** | Device info. Reload the app or open the dev menu, through the SDK or Metro. `adb reverse`. **Custom commands** your app registers appear as buttons. |
 
-It also supports multiple devices at once, pausing capture, dark, light or system theme, and keyboard shortcuts (`⌘1–8`, `⌘K` to clear, `⌘F` to filter, `⌘,` for settings).
+It also supports multiple devices at once, pausing capture, dark, light or system theme, and keyboard shortcuts (`⌘1–9`, `⌘K` to clear, `⌘F` to filter, `⌘,` for settings).
 
 ## Get started
 

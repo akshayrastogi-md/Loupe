@@ -11,6 +11,7 @@ import { DEFAULT_PORT } from './protocol'
 import { createTransport, type Transport, type WebSocketFactory } from './transport'
 import { installNetwork } from './network'
 import { installWebSocket } from './websocket'
+import { trackQueryClient, type QueryBridge, type QueryClientLike } from './queries'
 import { installConsole } from './console'
 import { installErrors, toErrorPayload } from './errors'
 import { installPerformance } from './perf'
@@ -20,7 +21,7 @@ import { collectDeviceInfo, detectHost, getBundleUrl, getReactNative } from './e
 import { serialize } from './serialize'
 
 export * from './protocol'
-export type { StoreAdapter, AsyncStorageLike }
+export type { StoreAdapter, AsyncStorageLike, QueryClientLike }
 
 export interface LoupeOptions {
   /**
@@ -60,6 +61,8 @@ export interface LoupeClient {
   trackStore(name: string, adapter: StoreAdapter): () => void
   trackZustand(name: string, store: Parameters<typeof trackZustand>[2]): () => void
   reduxEnhancer(name?: string): ReturnType<typeof createReduxEnhancer>
+  /** Show a TanStack Query client's cache in Loupe's Queries panel. */
+  trackQueryClient(client: QueryClientLike, name?: string): () => void
   registerCommand(command: CustomCommand): () => void
 }
 
@@ -106,6 +109,7 @@ function createNoopClient(): LoupeClient {
     trackStore: () => noop,
     trackZustand: () => noop,
     reduxEnhancer: () => identityEnhancer,
+    trackQueryClient: () => noop,
     registerCommand: () => noop
   }
   return client
@@ -123,6 +127,7 @@ export function createLoupe(options: LoupeOptions = {}): LoupeClient {
   let storage: StorageBridge | null = null
   let sendToSocket: ((id: string, data: string) => boolean) | null = null
   const commands = new Map<string, CustomCommand>()
+  const queryClients = new Map<string, QueryBridge>()
 
   // `transport` is assigned below; closures only call it after connect().
   const send = (message: ClientMessage): void => transport.send(message)
@@ -180,6 +185,7 @@ export function createLoupe(options: LoupeOptions = {}): LoupeClient {
         conditions = message.payload.conditions
         registry.snapshot()
         void storage?.snapshot()
+        queryClients.forEach((bridge) => bridge.snapshot())
         if (commands.size) send({ type: 'commands.register', payload: { commands: describeCommands() } })
         return
       case 'mocks.update':
@@ -211,6 +217,9 @@ export function createLoupe(options: LoupeOptions = {}): LoupeClient {
         return
       case 'network.resend':
         void resendRequest(message.payload)
+        return
+      case 'query.action':
+        void queryClients.get(message.payload.client)?.run(message.payload.action, message.payload.hash)
         return
       case 'ws.send':
         sendToSocket?.(message.payload.id, message.payload.data)
@@ -305,6 +314,15 @@ export function createLoupe(options: LoupeOptions = {}): LoupeClient {
     },
     trackZustand: (name, store) => trackZustand(registry, name, store),
     reduxEnhancer: (name = 'redux') => createReduxEnhancer(registry, name),
+    trackQueryClient: (queryClient, name = 'default') => {
+      queryClients.get(name)?.dispose()
+      const bridge = trackQueryClient(name, queryClient, send)
+      queryClients.set(name, bridge)
+      return () => {
+        bridge.dispose()
+        queryClients.delete(name)
+      }
+    },
     registerCommand: (command) => {
       commands.set(command.id, command)
       send({ type: 'commands.register', payload: { commands: describeCommands() } })

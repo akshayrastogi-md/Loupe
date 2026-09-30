@@ -6,6 +6,7 @@ import { PANELS, Sidebar, StatusBar, TitleBar, Toasts } from './components/Shell
 import { NetworkPanel } from './panels/network/NetworkPanel'
 import { ConsolePanel } from './panels/ConsolePanel'
 import { StatePanel } from './panels/StatePanel'
+import { QueriesPanel } from './panels/QueriesPanel'
 import { StoragePanel } from './panels/StoragePanel'
 import { PerformancePanel } from './panels/PerformancePanel'
 import { ErrorsPanel } from './panels/ErrorsPanel'
@@ -101,6 +102,8 @@ function ActivePanel() {
       return <ConsolePanel />
     case 'state':
       return <StatePanel />
+    case 'queries':
+      return <QueriesPanel />
     case 'storage':
       return <StoragePanel />
     case 'performance':

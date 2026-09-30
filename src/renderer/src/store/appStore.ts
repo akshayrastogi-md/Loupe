@@ -3,7 +3,8 @@ import type { MockRule, NetworkConditions } from '@shared/protocol'
 import { DEFAULT_SETTINGS, type AppSettings, type HubEvent, type ServerStatus } from '@shared/types'
 import { createDeviceState, reduceHubEvents, type DeviceState, type DevicesMap } from './deviceState'
 
-export type PanelId = 'network' | 'console' | 'state' | 'storage' | 'performance' | 'errors' | 'mocks' | 'device'
+export type PanelId =
+  'network' | 'console' | 'state' | 'queries' | 'storage' | 'performance' | 'errors' | 'mocks' | 'device'
 
 export interface Toast {
   id: number

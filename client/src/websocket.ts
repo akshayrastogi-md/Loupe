@@ -18,7 +18,10 @@ function describeFrame(data: unknown): { data: string; binary: boolean; size: nu
     return { data: truncated ? data.slice(0, MAX_FRAME_CHARS) : data, binary: false, size: data.length, truncated }
   }
   const size =
-    (data as { byteLength?: number })?.byteLength ?? (data as { size?: number })?.size ?? (data as { length?: number })?.length ?? 0
+    (data as { byteLength?: number })?.byteLength ??
+    (data as { size?: number })?.size ??
+    (data as { length?: number })?.length ??
+    0
   return { data: `[Binary ${size} bytes]`, binary: true, size }
 }
 
@@ -27,7 +30,10 @@ function describeFrame(data: unknown): { data: string; binary: boolean; size: nu
  * captured the native constructor at import time, so it is never recorded.
  * Returns an uninstall function and a way to send a frame into a live socket.
  */
-export function installWebSocket(ctx: WebSocketContext): { uninstall: () => void; sendTo: (id: string, data: string) => boolean } {
+export function installWebSocket(ctx: WebSocketContext): {
+  uninstall: () => void
+  sendTo: (id: string, data: string) => boolean
+} {
   const g = globalThis as { WebSocket?: SocketCtor }
   const Original = g.WebSocket
   const live = new Map<string, WebSocket>()
@@ -48,14 +54,22 @@ export function installWebSocket(ctx: WebSocketContext): { uninstall: () => void
     }
     ctx.send({
       type: 'ws.open',
-      payload: { id, url, protocols: protocols === undefined ? undefined : ([] as string[]).concat(protocols), timestamp: now() }
+      payload: {
+        id,
+        url,
+        protocols: protocols === undefined ? undefined : ([] as string[]).concat(protocols),
+        timestamp: now()
+      }
     })
     socket.addEventListener('open', () =>
       safe(() => ctx.send({ type: 'ws.status', payload: { id, status: 'open', timestamp: now() } }))
     )
     socket.addEventListener('message', (event: MessageEvent) =>
       safe(() =>
-        ctx.send({ type: 'ws.frame', payload: { id, direction: 'received', ...describeFrame(event.data), timestamp: now() } })
+        ctx.send({
+          type: 'ws.frame',
+          payload: { id, direction: 'received', ...describeFrame(event.data), timestamp: now() }
+        })
       )
     )
     socket.addEventListener('error', () =>
@@ -64,13 +78,18 @@ export function installWebSocket(ctx: WebSocketContext): { uninstall: () => void
     socket.addEventListener('close', (event: CloseEvent) =>
       safe(() => {
         live.delete(id)
-        ctx.send({ type: 'ws.status', payload: { id, status: 'closed', code: event.code, reason: event.reason, timestamp: now() } })
+        ctx.send({
+          type: 'ws.status',
+          payload: { id, status: 'closed', code: event.code, reason: event.reason, timestamp: now() }
+        })
       })
     )
     const originalSend = socket.send.bind(socket)
     socket.send = (data: Parameters<WebSocket['send']>[0]) => {
       originalSend(data)
-      safe(() => ctx.send({ type: 'ws.frame', payload: { id, direction: 'sent', ...describeFrame(data), timestamp: now() } }))
+      safe(() =>
+        ctx.send({ type: 'ws.frame', payload: { id, direction: 'sent', ...describeFrame(data), timestamp: now() } })
+      )
     }
   }
 

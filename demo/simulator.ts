@@ -326,6 +326,77 @@ function startChatSocket(): void {
   }, 2500)
 }
 
+// Simulated TanStack Query cache for the Queries panel.
+interface DemoQuery {
+  hash: string
+  key: unknown[]
+  status: 'pending' | 'error' | 'success'
+  fetchStatus: 'fetching' | 'paused' | 'idle'
+  isStale: boolean
+  isInvalidated: boolean
+  observers: number
+  dataUpdatedAt: number
+  errorUpdatedAt: number
+  failureCount: number
+  error?: string
+  data?: unknown
+}
+let demoQueries: DemoQuery[] = []
+
+function resetDemoQueries(): void {
+  const now = Date.now()
+  const q = (key: unknown[], extra: Partial<DemoQuery>): DemoQuery => ({
+    hash: JSON.stringify(key),
+    key,
+    status: 'success',
+    fetchStatus: 'idle',
+    isStale: false,
+    isInvalidated: false,
+    observers: 1,
+    dataUpdatedAt: now - 4000,
+    errorUpdatedAt: 0,
+    failureCount: 0,
+    ...extra
+  })
+  demoQueries = [
+    q(['me'], { data: { id: 7, name: 'Asha', plan: 'pro' } }),
+    q(['products', { page: 1 }], { data: { page: 1, items: [{ id: 100, title: 'Linen Shirt' }] }, observers: 2 }),
+    q(['orders', 'o_1'], { isStale: true, data: { id: 'o_1', total: 1299 } }),
+    q(['recommendations'], { observers: 0, isStale: true, data: [{ id: 5 }] }),
+    q(['checkout', 'quote'], {
+      status: 'error',
+      error: 'Payment gateway timeout (PGW_504)',
+      failureCount: 3,
+      errorUpdatedAt: now - 2000
+    })
+  ]
+}
+
+function sendQueries(): void {
+  send({ type: 'query.snapshot', payload: { client: 'default', queries: demoQueries, timestamp: Date.now() } })
+}
+
+function runQueryAction(action: string, hash?: string): void {
+  const matches = (item: DemoQuery): boolean => !hash || item.hash === hash
+  if (action === 'remove') demoQueries = demoQueries.filter((item) => !matches(item))
+  else
+    demoQueries = demoQueries.map((item) => {
+      if (!matches(item)) return item
+      if (action === 'invalidate') return { ...item, isStale: true, isInvalidated: true }
+      if (action === 'reset') return { ...item, status: 'pending', data: undefined, dataUpdatedAt: 0, error: undefined }
+      return {
+        ...item,
+        status: 'success',
+        error: undefined,
+        isStale: false,
+        isInvalidated: false,
+        failureCount: 0,
+        dataUpdatedAt: Date.now()
+      }
+    })
+  sendQueries()
+}
+
 function startStreams(): void {
   startChatSocket()
   let heap = 38
@@ -352,6 +423,8 @@ function handle(message: ServerMessage): void {
       conditions = message.payload.conditions
       send({ type: 'state.snapshot', payload: { store: 'redux', state } })
       storageSnapshot()
+      resetDemoQueries()
+      sendQueries()
       send({
         type: 'commands.register',
         payload: {
@@ -432,6 +505,9 @@ function handle(message: ServerMessage): void {
     case 'app.reload':
       console.log('[demo] reload requested, reconnecting…')
       socket.close()
+      return
+    case 'query.action':
+      runQueryAction(message.payload.action, message.payload.hash)
       return
     case 'ws.send':
       if (message.payload.id === CHAT_SOCKET) {

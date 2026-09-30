@@ -82,6 +82,17 @@ test('inspects WebSocket frames and sends into a live socket', async () => {
   await page.getByRole('button', { name: /^HTTP/ }).click()
 })
 
+test('inspects TanStack queries and runs cache actions', async () => {
+  await nav('Queries').click()
+  await expect(page.getByText('checkout › quote')).toBeVisible()
+  await page.locator('.action-row', { hasText: 'orders › o_1' }).click()
+  await page.getByRole('button', { name: 'Refetch', exact: true }).click()
+  await expect(page.locator('.action-row', { hasText: 'orders › o_1' })).toContainText('FRESH')
+  await page.locator('.action-row', { hasText: 'orders › o_1' }).click()
+  await page.getByRole('button', { name: 'Invalidate all' }).click()
+  await expect(page.locator('.action-row', { hasText: 'orders › o_1' })).toContainText('STALE')
+})
+
 test('creates a mock from a captured request', async () => {
   await nav('Network').click()
   // Close any open detail pane first: clicking a selected row toggles it off.

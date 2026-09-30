@@ -36,6 +36,15 @@ loupe.trackZustand('cart', useCartStore)
 loupe.trackStore('session', { getState, subscribe, dispatch, restore })
 ```
 
+### TanStack Query
+
+Shows every cached query in Loupe's **Queries** panel, with status, data, errors and observers. You can refetch, invalidate, reset or remove queries from the desktop:
+
+```ts
+const queryClient = new QueryClient()
+loupe.trackQueryClient(queryClient)
+```
+
 ### Custom commands
 
 These show up as buttons in Loupe's Device panel:
@@ -68,7 +77,7 @@ loupe.log('checkout started', { cartId })
 | `appName` | `'React Native App'` | Shown in Loupe's device picker. |
 | `host` | auto | Loupe's host. By default it tries the Metro host, then `localhost` (iOS simulator), then `10.0.2.2` (Android emulator). |
 | `port` | `9393` | Must match Loupe's port setting. |
-| `network`, `console`, `errors`, `performance` | `true` | Turn individual features on or off. |
+| `network`, `console`, `errors`, `performance`, `websockets` | `true` | Turn individual features on or off. |
 | `asyncStorage` | none | Pass your AsyncStorage instance to enable the Storage panel. |
 | `ignoreUrls` | `[]` | URLs containing any of these strings are never captured. |
 

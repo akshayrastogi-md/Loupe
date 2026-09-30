@@ -121,7 +121,7 @@ export function SettingsDialog() {
         <div className="settings-title">Keyboard shortcuts</div>
         <div className="shortcuts">
           <span>
-            <kbd>⌘1</kbd>–<kbd>⌘8</kbd> Switch panel
+            <kbd>⌘1</kbd>–<kbd>⌘9</kbd> Switch panel
           </span>
           <span>
             <kbd>⌘K</kbd> Clear current panel
