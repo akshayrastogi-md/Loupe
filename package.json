@@ -2,7 +2,7 @@
   "name": "loupe",
   "productName": "Loupe",
   "version": "0.1.0",
-  "description": "A professional desktop devtool for React Native developers: network inspector, logs, state, storage, performance and more.",
+  "description": "Desktop debugger for React Native: network inspector, WebSockets, TanStack Query, state, storage, logs and API mocking.",
   "main": "./out/main/index.js",
   "author": "Akshay Rastogi",
   "license": "MIT",
@@ -76,5 +76,28 @@
   "homepage": "https://github.com/akshayrastogi-md/Loupe#readme",
   "bugs": {
     "url": "https://github.com/akshayrastogi-md/Loupe/issues"
-  }
+  },
+  "keywords": [
+    "react-native",
+    "react-native-debugger",
+    "debugger",
+    "devtools",
+    "network-inspector",
+    "network-debugger",
+    "http-inspector",
+    "api-mocking",
+    "flipper-alternative",
+    "reactotron-alternative",
+    "expo",
+    "expo-go",
+    "hermes",
+    "redux",
+    "redux-devtools",
+    "zustand",
+    "tanstack-query",
+    "react-query",
+    "react-navigation",
+    "websocket",
+    "async-storage"
+  ]
 }

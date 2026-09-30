@@ -1,81 +1,167 @@
-# Loupe
+<p align="center">
+  <img src="build/icon.png" width="96" alt="Loupe logo" />
+</p>
 
-A desktop debugger for React Native. It shows network traffic, logs, state, storage, performance and errors for any RN app, and lets you mock APIs and throttle the network. It runs on macOS, Windows and Linux.
+<h1 align="center">Loupe</h1>
+
+<p align="center">
+  <strong>A desktop debugger for React Native.</strong><br />
+  Network inspector, WebSockets, TanStack Query, Redux/Zustand state, AsyncStorage, logs, errors and API mocking in one app.<br />
+  Add one line to your app. No native code, no config, and it works in Expo Go.
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/loupe-rn"><img src="https://img.shields.io/npm/v/loupe-rn?color=8b6cff&label=loupe-rn" alt="npm version" /></a>
+  <a href="https://www.npmjs.com/package/loupe-rn"><img src="https://img.shields.io/npm/dm/loupe-rn?color=3ecf8e" alt="npm downloads" /></a>
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Windows%20%7C%20Linux-lightgrey" alt="Platforms" />
+  <img src="https://img.shields.io/badge/Expo-supported-000020?logo=expo" alt="Expo supported" />
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/akshayrastogi-md/Loupe" alt="MIT license" /></a>
+</p>
+
+<p align="center">
+  <img src="docs/images/network.png" alt="Loupe network inspector showing React Native API requests, a GraphQL operation and a JSON response" width="100%" />
+</p>
+
+---
+
+## Why Loupe?
+
+Debugging React Native usually means juggling several tools. Flipper's React Native integration was removed in RN 0.74, `console.log` doesn't show you response bodies, and seeing network traffic, state and storage together often means extra native setup.
+
+Loupe puts all of it in **one fast desktop window**, connected over a WebSocket by a **zero-dependency JavaScript SDK**:
+
+- 🔌 **One line to set up.** No native modules, no pods, no rebuild. Works with Expo Go and bare React Native.
+- 🌐 **See every request.** `fetch`, axios and `XMLHttpRequest`, with headers, bodies, timing and GraphQL operation names.
+- 🧪 **Mock any API** from the desktop: change status, body or delay, go offline, or throttle to "Slow 3G".
+- 🧠 **Inspect the app's brain.** TanStack Query cache, Redux/Zustand state with diffs and time travel, React Navigation, AsyncStorage.
+- 🛡️ **Safe by default.** The SDK does nothing in release builds, and exports hide auth tokens and passwords.
+
+## Quick start
+
+**1. Install the desktop app.** Download it from [Releases](https://github.com/akshayrastogi-md/Loupe/releases), or [build it from source](#build-from-source).
+
+**2. Add the SDK to your app:**
+
+```bash
+npm install --save-dev loupe-rn
+```
+
+```ts
+// index.js: import before your App
+import createLoupe from 'loupe-rn'
+
+export const loupe = createLoupe({ appName: 'My App' }).connect()
+```
+
+**3. Run your app.** It shows up in Loupe right away. That's it.
+
+<details>
+<summary><strong>Optional: connect state, queries, navigation and storage</strong></summary>
+
+```ts
+import AsyncStorage from '@react-native-async-storage/async-storage'
+
+export const loupe = createLoupe({ appName: 'My App', asyncStorage: AsyncStorage }).connect()
+
+loupe.trackQueryClient(queryClient)                    // TanStack Query → Queries panel
+loupe.trackZustand('cart', useCartStore)               // Zustand → State panel
+configureStore({ reducer, enhancers: (d) => d().concat(loupe.reduxEnhancer()) }) // Redux Toolkit
+loupe.trackNavigation(navigationRef)                   // React Navigation
+loupe.registerCommand({ id: 'logout', title: 'Log out', handler: logout }) // buttons in Loupe
+```
+
+The full SDK reference is in [client/README.md](client/README.md).
+
+</details>
 
 ## Features
 
-| Panel | What you get |
+### 🌐 Network inspector
+
+Every request with status, timing and a waterfall. Filter by URL, `status:404`, type or method. Open the headers, payload and a searchable JSON response tree. **Copy as cURL or fetch()**, **edit & resend** from the device or desktop, **export HAR** with secrets hidden, and turn any response into a mock in one click.
+
+### ⚡ WebSocket inspector
+
+Chat, live updates and GraphQL subscriptions: every frame in both directions, with JSON previews. You can also **send frames into a live socket** from the desktop.
+
+<img src="docs/images/websockets.png" alt="WebSocket inspector showing frames sent and received by a React Native chat socket" width="100%" />
+
+### 🔁 TanStack Query panel
+
+Every cached query with its fresh, stale, fetching, inactive or error state, plus data, observers and errors. **Refetch, invalidate, reset or remove** any query, or all of them.
+
+<img src="docs/images/queries.png" alt="TanStack Query cache inspector for React Native with refetch and invalidate actions" width="100%" />
+
+### 🧪 API mocking and network conditions
+
+Intercept matching requests inside the app and return your own status, headers, body and delay, with no backend changes. Simulate **offline mode** or **slow networks** to test loading and error states.
+
+<img src="docs/images/mocks.png" alt="API mock editor in Loupe for React Native" width="100%" />
+
+### And much more
+
+| | |
 |---|---|
-| **Network** | Every `fetch`/XHR/axios request (native fetch and the XHR polyfill), with status, method, host, type, size, time and a waterfall. You can filter by text, `status:404`, type, method, failed-only or mocked-only. The detail pane shows headers, query params, payload, a searchable JSON tree of the response, image preview and timing. Copy as **cURL** or **fetch()**, **Replay** a request, **Mock** it from the captured response, or **Export HAR**. GraphQL operation names are detected. **WebSockets:** connections and frames in both directions, and you can send frames into a live socket. **Edit & resend** from the device or desktop, and **Export HAR** with secrets hidden. |
-| **Console** | Streams `console.*` output with level filters, search, expandable objects and collapsible long lines. History is kept across app reloads. |
-| **Queries** | TanStack Query cache: fresh, fetching, stale, inactive and error states, data and details, plus refetch, invalidate, reset or remove per query or for all. |
-| **State** | Redux, Zustand or any store: an action log with timings, **diffs**, **dispatch** from the desktop, and **time travel**. |
-| **Storage** | View, edit, add, delete and clear AsyncStorage keys. The view refreshes automatically when the app writes. |
-| **Performance** | Live JS frame rate, event-loop lag and Hermes heap. |
-| **Errors** | Grouped JS errors with a parsed stack, **Metro symbolication**, **open in editor**, and the component stack. |
-| **Mocks & Throttling** | Mock rules by URL (contains, equals or regex) plus method, with status, headers, body and delay. Also **offline simulation** and latency presets. |
-| **Device & Commands** | Device info. One-click **JS debugger** (React Native DevTools). **Deep-link launcher** for the iOS simulator and Android. React Navigation state via `trackNavigation`. Reload the app or open the dev menu, through the SDK or Metro. `adb reverse`. **Custom commands** your app registers appear as buttons. |
+| **State** | Redux, Zustand or any store: action log, diffs, dispatch from the desktop, time travel |
+| **Console** | Live `console.*` output with level filters, search and expandable objects |
+| **Errors** | Grouped JS errors, readable stack traces, **Metro symbolication**, open in editor |
+| **Performance** | Live JS frame rate, event-loop lag and Hermes heap charts |
+| **Storage** | View, edit and delete AsyncStorage keys (v2 and v3) |
+| **Device tools** | One-click **React Native DevTools debugger**, deep-link launcher, reload, `adb reverse`, custom commands |
+| **Sessions** | Export a full capture as a `.loupe` file and share it with a teammate |
 
-**Sessions:** export a device's whole capture as a `.loupe` file (secrets hidden by default) and import it on another machine as a read-only device, for sharing bug reports. It also supports multiple devices at once, pausing capture, dark, light or system theme, and keyboard shortcuts (`⌘1–9`, `⌘K` to clear, `⌘F` to filter, `⌘,` for settings).
+<img src="docs/images/performance.png" alt="React Native performance monitor with FPS, JS thread lag and memory charts" width="100%" />
 
-## Get started
+## Works with
 
-1. **Install the desktop app** from the Releases page, or build it yourself (see below).
-2. **Add the SDK** to your React Native app. The full guide is in [client/README.md](client/README.md).
+**React Native** 0.70+ (tested on 0.86 and 0.87) · **Expo**, including Expo Go · **Hermes** and JSC · iOS simulator, Android emulator and physical devices · `fetch`, **axios**, `XMLHttpRequest`, **WebSockets** · **TanStack Query** · **Redux Toolkit** · **Zustand** · **React Navigation** · **AsyncStorage** v2 and v3
 
-   ```bash
-   npm install --save-dev loupe-rn
-   ```
+## FAQ
 
-   ```ts
-   import AsyncStorage from '@react-native-async-storage/async-storage'
-   import createLoupe from 'loupe-rn'
+<details>
+<summary><strong>Does it affect production builds?</strong></summary>
 
-   export const loupe = createLoupe({ appName: 'My App', asyncStorage: AsyncStorage }).connect()
-   ```
+No. `createLoupe` defaults to `enabled: __DEV__`, so release builds get an inert client: nothing is patched and no socket is opened.
+</details>
 
-   The SDK does nothing in release builds (`enabled` defaults to `__DEV__`).
-3. **Run your app.** Simulators and emulators connect automatically. For physical devices over Wi‑Fi, turn on **Allow LAN connections** in Settings.
+<details>
+<summary><strong>How does it connect to a physical device?</strong></summary>
 
-Try it without an app: run `npm run demo` in this repo to connect a simulated device. There's also a real Expo app in `examples/expo-example`.
+The SDK tries the Metro host first, then `localhost` (iOS simulator) and `10.0.2.2` (Android emulator). For a phone on Wi‑Fi, turn on **Settings → Allow LAN connections** in Loupe. For Android over USB, click **adb reverse** in the Device panel.
+</details>
+
+<details>
+<summary><strong>Is it a replacement for React Native DevTools?</strong></summary>
+
+It complements it. React Native DevTools gives you the JS debugger and profiler, and Loupe opens it for you in one click. Loupe adds the app-level views: network mocking, WebSockets, query cache, state, storage and shareable sessions.
+</details>
+
+<details>
+<summary><strong>Is my data sent anywhere?</strong></summary>
+
+No. Everything stays on your machine. By default Loupe only accepts connections from `localhost`, and browser pages are rejected. See [SECURITY.md](SECURITY.md).
+</details>
+
+<details>
+<summary><strong>Why can't it see some uploads or image loads?</strong></summary>
+
+Libraries that send requests from native code (for example `react-native-blob-util`) bypass the JavaScript network layer. Native capture is on the roadmap.
+</details>
 
 ## Build from source
 
 ```bash
+git clone https://github.com/akshayrastogi-md/Loupe.git && cd Loupe
 npm install
-npm run dev          # development, with hot reload
-npm run dist:dir     # unpacked app for this OS, in release/<version>/
-npm run dist         # installers: dmg/zip on macOS, NSIS on Windows, AppImage/deb on Linux
+npm run dev        # run with hot reload
+npm run demo       # connect a simulated device (second terminal)
+npm run dist       # build installers: dmg (macOS), NSIS (Windows), AppImage/deb (Linux)
 ```
 
-Unsigned local builds work. For distribution, set the signing and notarization variables described in [CONTRIBUTING.md](CONTRIBUTING.md#releasing), or push a `v*` tag to run the release workflow. To turn on auto-updates, fill in `publish` in `electron-builder.yml`.
+## Contributing
 
-Logs are written to `~/Library/Logs/Loupe` on macOS and `%APPDATA%\Loupe\logs` on Windows. You can also use Help → Open Logs Folder.
-
-## Quality
-
-| Command | What it checks |
-|---|---|
-| `npm run verify` | ESLint, TypeScript (main, renderer and SDK), unit tests with enforced coverage thresholds (currently about 84% of statements), and the SDK build. |
-| `npm run test:e2e` | Playwright drives the real Electron app with a simulated device: onboarding, network capture, mocking, commands, state/storage, disconnect. |
-| CI | All of the above, plus packaging on macOS, Windows and Linux. |
-
-The SDK has also been tested in a real Expo SDK 57 / React Native 0.86 app on the iOS simulator. That testing found the React Native-specific fixes now covered by tests: native-fetch capture, the missing XHR `statusText`, and falling back to `localhost` when Metro serves over the LAN IP.
-
-## Architecture
-
-```
-client/        React Native SDK (no runtime deps). client/src/protocol.ts is the wire protocol.
-src/main/      Electron main: WebSocket hub, IPC, persistence, Metro/adb/replay tools, logging, updater, menu
-src/preload/   contextBridge API (sandboxed)
-src/renderer/  React UI: pure reducer + zustand store + panels
-src/shared/    Pure helpers: HAR, snippets, diff, stack parsing, filters, formatting
-e2e/           Playwright end-to-end tests
-demo/          Simulated app that speaks the real protocol
-```
-
-See [SECURITY.md](SECURITY.md) for the threat model and [CHANGELOG.md](CHANGELOG.md) for release notes.
+Issues and pull requests are welcome. See [CONTRIBUTING.md](CONTRIBUTING.md). If Loupe saves you time, a ⭐ on GitHub helps other React Native developers find it.
 
 ## License
 
-MIT
+[MIT](LICENSE) © Akshay Rastogi
