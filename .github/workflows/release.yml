@@ -62,7 +62,14 @@ jobs:
           registry-url: https://registry.npmjs.org
       - run: npm ci
       - run: npm run test
-      - run: npm publish --provenance --access public
+      - name: Publish SDK (skipped if this version is already on npm)
         working-directory: client
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          if npm view "loupe-rn@$VERSION" version >/dev/null 2>&1; then
+            echo "loupe-rn@$VERSION is already published; skipping."
+          else
+            npm publish --provenance --access public
+          fi
